@@ -789,6 +789,12 @@
         }
         /* === End Floating Preview Button === */
 
+        /* === Modal Open Body Lock === */
+        body.modal-open {
+            overflow: hidden; /* Prevent body scrolling when any modal is open */
+        }
+        /* === End Modal Open Body Lock === */
+
         .style-selector {
             margin-left: auto;
             min-width: 140px;
@@ -1661,7 +1667,7 @@
                     </div>
                 </h2>
                 <div class="preview-container" style="min-height: 0;"> 
-                    <div id="modalCardPreview" class="preview-content active preview-box" style="overflow: visible;"> 
+                    <div id="modalCardPreview" class="preview-content active preview-box"> 
                         <div class="card-preview-container">
                             <div class="card-preview with-intent" id="modalCardPreviewContent">
                                 <div class="card-header">
@@ -2721,6 +2727,7 @@
                 const content = quill2.root.innerHTML; // Get content from AI editor
                 modalCardContentArea.innerHTML = content; // Set modal preview content
                 previewModal.style.display = 'flex'; // Show modal
+                document.body.classList.add('modal-open'); // Add class to body
                 // Ensure initial style matches dropdown
                 const currentStyle = modalCardStyleSelector.value;
                 modalCardPreviewContent.classList.remove('text-only', 'with-intent', 'with-pills', 'with-quick-actions');
@@ -2730,12 +2737,14 @@
             // Close Modal
             previewModalClose.addEventListener('click', () => {
                 previewModal.style.display = 'none';
+                document.body.classList.remove('modal-open'); // Remove class from body
             });
 
             // Optional: Close modal if clicking outside the content
             previewModal.addEventListener('click', (event) => {
                 if (event.target === previewModal) { // Check if click is on the modal background
                     previewModal.style.display = 'none';
+                    document.body.classList.remove('modal-open'); // Remove class from body
                 }
             });
             
