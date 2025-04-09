@@ -911,8 +911,12 @@
         }
         
         #tab-two #editor-container2 {
-            height: 350px;
-            margin-bottom: 20px;
+            /* height: 350px; */ /* Removed fixed height */
+            /* margin-bottom: 20px; */ /* Removed margin */
+            flex-grow: 1; /* Added to fill space */
+            display: flex; /* Added for inner Quill elements */
+            flex-direction: column; /* Added for inner Quill elements */
+            overflow: hidden; /* Added to prevent container scrollbars */
         }
         
         
