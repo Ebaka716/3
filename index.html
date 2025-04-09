@@ -2150,8 +2150,8 @@
             const selectedStyle = this.value;
             const cardPreview = document.getElementById('cardPreviewContent');
             
-            // Remove all styles first
-            cardPreview.classList.remove('text-only', 'with-intent', 'with-pills');
+            // Remove all styles first - INCLUDING the new one
+            cardPreview.classList.remove('text-only', 'with-intent', 'with-pills', 'with-quick-actions');
             
             // Add the selected style
             cardPreview.classList.add(selectedStyle);
