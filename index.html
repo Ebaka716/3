@@ -759,8 +759,9 @@
         #showPreviewButton {
             position: fixed;
             right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
+            /* top: 50%; */ /* Removed */
+            /* transform: translateY(-50%); */ /* Removed */
+            bottom: 20px; /* Added */
             background-color: #6200ea; /* Match AI theme */
             color: white;
             border: none;
@@ -1646,7 +1647,7 @@
                 <button class="modal-close" id="previewModalClose">&times;</button>
             </div>
             <!-- Duplicated Preview Structure -->
-            <div class="text-box" style="height: auto; max-height: 70vh; box-shadow: none; padding: 0;"> 
+            <div class="text-box" style="height: auto; max-height: 70vh; box-shadow: none; padding: 0; overflow-y: auto;"> 
                  <h2>
                     <div class="heading-actions">
                         <div class="style-selector">
@@ -1659,8 +1660,8 @@
                         </div>
                     </div>
                 </h2>
-                <div class="preview-container" style="height: 100%;"> 
-                    <div id="modalCardPreview" class="preview-content active preview-box" style="height: 100%;"> 
+                <div class="preview-container" style="min-height: 0;"> 
+                    <div id="modalCardPreview" class="preview-content active preview-box" style="overflow: visible;"> 
                         <div class="card-preview-container">
                             <div class="card-preview with-intent" id="modalCardPreviewContent">
                                 <div class="card-header">
