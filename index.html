@@ -873,24 +873,37 @@
         }
         
         #tab-one #editor-container {
-            height: 250px;
-            overflow-y: auto;
-            margin-bottom: 10px;
+            /* height: 250px; */ /* REMOVED */
+            flex-grow: 1; /* Make Quill container fill pane */
+            display: flex; /* Ensure inner Quill structure works */
+            flex-direction: column;
+            min-height: 0; /* Prevent flexbox issues with min-height */
         }
-        
-        #tab-one .output-container {
-            height: 280px;
-            max-height: 280px;
+         /* Ensure Quill editor area grows */
+        #tab-one #editor-container .ql-editor {
             flex-grow: 1;
-            overflow: hidden;
+            overflow-y: auto;
         }
-        
+
+        #tab-one .output-container {
+            /* height: 280px; */ /* REMOVED */
+            /* max-height: 280px; */ /* REMOVED */
+            flex-grow: 1; /* Make output container fill pane */
+            display: flex; /* To make textarea grow */
+            flex-direction: column; /* Ensure textarea can grow */
+            min-height: 0; /* Prevent flexbox issues */
+        }
+
         #tab-one #inputText {
-            height: 100%;
-            width: 100%;
-            max-height: 280px;
+            /* height: 100%; */ /* Let flexbox handle */
+            /* max-height: 280px; */ /* REMOVED */
+            flex-grow: 1; /* Make textarea fill container */
+            resize: none; /* Disable textarea's own resize */
+            border: none; /* Optional: remove border if container handles it */
+            padding: 5px; /* Add some internal padding */
+            overflow-y: auto; /* Allow scrolling within textarea */
         }
-        
+
         #tab-one .import-status {
             margin-top: 10px;
             position: absolute;
@@ -994,6 +1007,31 @@
             width: 16px;
             height: 16px;
         }
+        
+        /* === Resizable Pane Styles === */
+        #editor-pane,
+        #output-pane {
+            flex: 1; /* Start by sharing space */
+            min-height: 100px; /* Minimum height */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevent internal content from causing overflow */
+        }
+        
+        #output-pane {
+             min-height: 150px; /* Needs more space for controls */
+        }
+
+        #resize-handle {
+            height: 8px;
+            background-color: #e0e0e0;
+            cursor: ns-resize;
+            flex-shrink: 0; /* Prevent handle from shrinking */
+            margin: 4px 0;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+        /* === End Resizable Pane Styles === */
     </style>
 </head>
 <body>
@@ -1045,39 +1083,47 @@
                             </div>
                         </h2>
                         
-                        <!-- Quill editor container with relative positioning -->
-                        <div style="position: relative; flex-grow: 1; display: flex; flex-direction: column;">
-                            <div id="editor-container"></div>
+                        <!-- Wrap editor in its own pane -->
+                        <div id="editor-pane">
+                            <!-- Quill editor container with relative positioning -->
+                            <div style="position: relative; flex-grow: 1; display: flex; flex-direction: column;">
+                                <div id="editor-container"></div>
+                                
+                                <!-- Clear button positioned within editor area -->
+                                <button id="clearButton" class="clear-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                    Clear Content
+                                </button>
+                            </div>
+                            <!-- Hidden textarea to store raw content -->
+                            <textarea id="rawContent" class="raw-text"></textarea>
+                            <!-- Import status moved inside output pane now -->
+                        </div> 
+
+                        <!-- Draggable Resize Handle -->
+                        <div id="resize-handle"></div>
+
+                        <!-- Wrap output section in its own pane -->
+                        <div id="output-pane">
+                            <!-- Format toggle -->
+                            <div class="section-label">
+                                Display Options
+                                <button id="copyButton" class="copy-button" onclick="copyCurrentFormat()">Copy HTML to Clipboard</button>
+                            </div>
+                            <div class="toggle-container">
+                                <button id="htmlToggle" class="toggle-button active" onclick="toggleFormat('html')">Show HTML</button>
+                                <button id="markdownToggle" class="toggle-button" onclick="toggleFormat('markdown')">Show Markdown</button>
+                            </div>
                             
-                            <!-- Clear button positioned within editor area -->
-                            <button id="clearButton" class="clear-button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                                Clear Content
-                            </button>
-                        </div>
-                        
-                        <!-- Hidden textarea to store raw content -->
-                        <textarea id="rawContent" class="raw-text"></textarea>
-                        
-                        <!-- Import options - remove section but keep status -->
-                        <div id="importStatus" class="import-status"></div>
-                        
-                        <!-- Format toggle -->
-                        <div class="section-label">
-                            Display Options
-                            <button id="copyButton" class="copy-button" onclick="copyCurrentFormat()">Copy HTML to Clipboard</button>
-                        </div>
-                        <div class="toggle-container">
-                            <button id="htmlToggle" class="toggle-button active" onclick="toggleFormat('html')">Show HTML</button>
-                            <button id="markdownToggle" class="toggle-button" onclick="toggleFormat('markdown')">Show Markdown</button>
-                        </div>
-                        
-                        <!-- Raw text output -->
-                        <div class="output-container">
-                            <textarea id="inputText" placeholder="Formatted code will appear here..."></textarea>
+                            <!-- Raw text output -->
+                            <div class="output-container">
+                                <textarea id="inputText" placeholder="Formatted code will appear here..."></textarea>
+                            </div>
+                            <!-- Moved import status here -->
+                             <div id="importStatus" class="import-status"></div>
                         </div>
                     </div>
                     
@@ -2235,6 +2281,79 @@
                 console.error("Could not find toast element (copySuccess)!"); // Keep error logging
             }
         }
+
+        // === Resizable Panes Logic ===
+        const resizeHandle = document.getElementById('resize-handle');
+        if (resizeHandle) { // Check if handle exists (only on tab-one)
+            const editorPane = document.getElementById('editor-pane');
+            const outputPane = document.getElementById('output-pane');
+            // const textBox = editorPane.parentElement; // Or query directly if structure changes
+
+            let isResizing = false;
+            let startY, startEditorFlexBasis, startOutputFlexBasis;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                startY = e.clientY;
+                // Get current computed flex-basis or height as fallback
+                startEditorFlexBasis = editorPane.offsetHeight;
+                startOutputFlexBasis = outputPane.offsetHeight;
+                
+                document.body.style.cursor = 'ns-resize'; // Indicate resizing globally
+                document.body.style.userSelect = 'none'; // Prevent text selection
+
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('mouseup', handleMouseUp);
+            });
+
+            function handleMouseMove(e) {
+                if (!isResizing) return;
+
+                const deltaY = e.clientY - startY;
+                let newEditorHeight = startEditorFlexBasis + deltaY;
+                let newOutputHeight = startOutputFlexBasis - deltaY;
+
+                // Min height constraints (adjust values as needed)
+                const minEditorHeight = 100; 
+                const minOutputHeight = 150;
+
+                // Ensure we don't exceed total available height logic implicitly handled by flexbox
+                // but clamp to minimums
+                if (newEditorHeight < minEditorHeight) {
+                    newEditorHeight = minEditorHeight;
+                    newOutputHeight = (startEditorFlexBasis + startOutputFlexBasis) - newEditorHeight;
+                } else if (newOutputHeight < minOutputHeight) {
+                    newOutputHeight = minOutputHeight;
+                    newEditorHeight = (startEditorFlexBasis + startOutputFlexBasis) - newOutputHeight;
+                }
+
+                // Set flex-basis to control size, set flex-grow to 0 during resize
+                editorPane.style.flexGrow = '0';
+                editorPane.style.flexShrink = '0'; // Prevent shrinking too
+                editorPane.style.flexBasis = `${newEditorHeight}px`;
+
+                outputPane.style.flexGrow = '0';
+                outputPane.style.flexShrink = '0';
+                outputPane.style.flexBasis = `${newOutputHeight}px`;
+            }
+
+            function handleMouseUp() {
+                if (isResizing) {
+                    isResizing = false;
+                    document.body.style.cursor = ''; 
+                    document.body.style.userSelect = ''; 
+
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('mouseup', handleMouseUp);
+                    
+                    // Optional: Reset grow/shrink if needed, though basis should hold
+                    // editorPane.style.flexGrow = '1'; 
+                    // outputPane.style.flexGrow = '1';
+                }
+            }
+        } // end if (resizeHandle)
+        // === End Resizable Panes Logic ===
+
     </script>
 </body>
 </html>
