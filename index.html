@@ -295,16 +295,16 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background-color: #28a745;
+            background-color: #28a745; /* Default green background */
             color: white;
             padding: 10px 20px;
             border-radius: 4px;
             display: none;
-            z-index: 9999; /* Added to ensure visibility */
+            z-index: 9999;
         }
-        /* AI Success Toast Style */
+        /* AI Success Toast Style - ONLY defines the background override */
         .toast-ai {
-            background-color: #6200ea; /* Purple background */
+            background-color: #6200ea !important; /* Purple background - use !important to ensure override */
         }
 
         pre {
@@ -2219,12 +2219,14 @@
             if (toastElement) {
                 toastElement.innerHTML = message; // Set the message dynamically
                 
-                // Remove existing type classes and add the correct one
-                toastElement.classList.remove('copy-success', 'toast-ai'); 
+                // Ensure base class is always present
+                toastElement.classList.add('copy-success');
+                
+                // Add or remove the AI-specific color class
                 if (type === 'ai') {
-                    toastElement.classList.add('toast-ai');
+                    toastElement.classList.add('toast-ai'); // Add purple class
                 } else {
-                    toastElement.classList.add('copy-success'); // Default to green
+                    toastElement.classList.remove('toast-ai'); // Remove purple class for default (green)
                 }
                 
                 toastElement.style.display = 'block';
