@@ -52,8 +52,12 @@
         }
 
         /* Ensure list font size is standard */
-        ol, ul {
+        /* Updated for p, ol, ul */
+        p, ol, ul {
             font-size: 14px;
+            line-height: 20px; /* Updated */
+            font-weight: normal; /* Added for regular */
+            letter-spacing: -0.25px; /* Added */
         }
 
         .header {
@@ -549,12 +553,29 @@
         }
         
         /* Apply Fidelity typography to all headings */
+        /* General heading styles (can be overridden) */
         h1, h2, h3, h4, h5, h6 {
-            letter-spacing: var(--fidelity-header-letter-spacing);
-            line-height: 1.3;
+            letter-spacing: var(--fidelity-header-letter-spacing); /* Keeps default unless overridden */
+            line-height: 1.3; /* Keeps default unless overridden */
+        }
+
+        /* Specific heading styles */
+        h1 {
+            font-size: 20px;
+            line-height: 24px;
+            font-weight: bold;
+            letter-spacing: -0.25px;
+        }
+
+        h2 {
+            font-size: 18px;
+            line-height: 24px;
+            font-weight: bold;
+            letter-spacing: -0.25px;
         }
         
         /* Apply Fidelity typography to paragraph elements in the preview */
+        /* Note: The global 'p' rule above might affect this. Keep for potential specificity needs. */
         .card-content p {
             margin-bottom: 1em;
             line-height: var(--fidelity-line-height);
