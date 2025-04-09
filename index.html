@@ -300,6 +300,7 @@
             padding: 10px 20px;
             border-radius: 4px;
             display: none;
+            z-index: 9999; /* Added to ensure visibility */
         }
         pre {
             margin: 0 !important;
@@ -1813,38 +1814,38 @@
         
         function copyCurrentFormat() {
             var textToCopy = document.getElementById('inputText').value;
-            console.log("Attempting to copy for Tab 1..."); // DEBUG
+            // console.log("Attempting to copy for Tab 1..."); // DEBUG Removed
             navigator.clipboard.writeText(textToCopy).then(() => {
-                console.log("Clipboard write successful for Tab 1."); // DEBUG
+                // console.log("Clipboard write successful for Tab 1."); // DEBUG Removed
                 showCopySuccess();
             }).catch(err => {
-                console.error("Failed to copy for Tab 1: ", err); // DEBUG: Catch errors
+                console.error("Failed to copy for Tab 1: ", err); // Keep error logging
             });
         }
         
         function copyCurrentFormat2() {
             var textToCopy = document.getElementById('inputText2').value;
-            console.log("Attempting to copy for Tab 2..."); // DEBUG
+            // console.log("Attempting to copy for Tab 2..."); // DEBUG Removed
             navigator.clipboard.writeText(textToCopy).then(() => {
-                console.log("Clipboard write successful for Tab 2."); // DEBUG
+                // console.log("Clipboard write successful for Tab 2."); // DEBUG Removed
                 showCopySuccess();
             }).catch(err => {
-                console.error("Failed to copy for Tab 2: ", err); // DEBUG: Catch errors
+                console.error("Failed to copy for Tab 2: ", err); // Keep error logging
             });
         }
         
         function showCopySuccess() {
-            console.log("showCopySuccess called."); // DEBUG
+            // console.log("showCopySuccess called."); // DEBUG Removed
             const copySuccess = document.getElementById('copySuccess');
             if (copySuccess) {
-                console.log("Found copySuccess element. Setting display to block."); // DEBUG
+                // console.log("Found copySuccess element. Setting display to block."); // DEBUG Removed
                 copySuccess.style.display = 'block';
                 setTimeout(() => {
-                    console.log("Hiding copySuccess element."); // DEBUG
+                    // console.log("Hiding copySuccess element."); // DEBUG Removed
                     copySuccess.style.display = 'none';
                 }, 2000);
             } else {
-                console.error("Could not find copySuccess element!"); // DEBUG
+                console.error("Could not find copySuccess element!"); // Keep error logging
             }
         }
         
