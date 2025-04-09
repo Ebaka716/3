@@ -302,6 +302,11 @@
             display: none;
             z-index: 9999; /* Added to ensure visibility */
         }
+        /* AI Success Toast Style */
+        .toast-ai {
+            background-color: #6200ea; /* Purple background */
+        }
+
         pre {
             margin: 0 !important;
             padding: 0 !important;
@@ -2008,9 +2013,9 @@
                 // Update the preview
                 updatePreviewsAI();
                 
-                // Show success message using the toast notification
-                showSuccessToast("AI formatting successful!");
-                
+                // Show success message using the AI-specific toast
+                showSuccessToast("AI formatting successful!", 'ai'); 
+                                
             } catch (error) {
                 console.error('Error formatting with AI:', error);
                 
@@ -2208,11 +2213,20 @@
             errorContainer.classList.remove('visible');
         }
         
-        // Renamed from showCopySuccess and added message parameter
-        function showSuccessToast(message) {
-            const toastElement = document.getElementById('copySuccess'); // Keep ID or make generic?
+        // Renamed from showCopySuccess and added message/type parameters
+        function showSuccessToast(message, type = 'success') {
+            const toastElement = document.getElementById('copySuccess'); // Keep ID
             if (toastElement) {
                 toastElement.innerHTML = message; // Set the message dynamically
+                
+                // Remove existing type classes and add the correct one
+                toastElement.classList.remove('copy-success', 'toast-ai'); 
+                if (type === 'ai') {
+                    toastElement.classList.add('toast-ai');
+                } else {
+                    toastElement.classList.add('copy-success'); // Default to green
+                }
+                
                 toastElement.style.display = 'block';
                 setTimeout(() => {
                     toastElement.style.display = 'none';
