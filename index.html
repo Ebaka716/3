@@ -1558,6 +1558,244 @@
             border-bottom: 1px solid #ccc;
         }
         /* === End Resizable Pane Styles === */
+
+        /* === Quick Action Menu Styles === */
+        .card-separator {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 16px 0;
+        }
+
+        .quick-action-menu {
+            display: flex;
+            justify-content: flex-start; /* Align icons to the left */
+            gap: 12px; /* Space between icons */
+        }
+
+        .action-item {
+            display: inline-flex; /* Align icon nicely */
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            border-radius: 50%; /* Circular background */
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .action-item svg {
+            width: 18px;
+            height: 18px;
+            fill: #666; /* Default icon color */
+        }
+
+        .action-item:hover {
+            background-color: #f0f0f0; /* Light background on hover */
+        }
+        
+        /* Visibility control */
+        .card-preview:not(.with-quick-actions) .card-separator,
+        .card-preview:not(.with-quick-actions) .quick-action-menu {
+            display: none;
+        }
+        /* === End Quick Action Menu Styles === */
+
+        /* Card style variations */
+        .card-preview.text-only .card-header {
+            display: none;
+        }
+        
+        .card-preview.with-pills .card-pill-container {
+            display: flex;
+        }
+        
+        .card-preview:not(.with-pills) .card-pill-container {
+            display: none;
+        }
+        
+        /* Make section label items align better */
+        .section-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Tab One specific styles to maximize space */
+        #tab-one .text-box {
+            height: 620px;
+            max-height: 620px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        #tab-one .container {
+            gap: 20px;
+            padding: 0 32px;
+            max-width: 100%;
+        }
+        
+        #tab-one #editor-container {
+            /* height: 250px; */ /* REMOVED */
+            flex-grow: 1; /* Make Quill container fill pane */
+            display: flex; /* Ensure inner Quill structure works */
+            flex-direction: column;
+            min-height: 0; /* Prevent flexbox issues with min-height */
+        }
+         /* Ensure Quill editor area grows */
+        #tab-one #editor-container .ql-editor {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        #tab-one .output-container {
+            /* height: 280px; */ /* REMOVED */
+            /* max-height: 280px; */ /* REMOVED */
+            flex-grow: 1; /* Make output container fill pane */
+            display: flex; /* To make textarea grow */
+            flex-direction: column; /* Ensure textarea can grow */
+            min-height: 0; /* Prevent flexbox issues */
+        }
+
+        #tab-one #inputText {
+            /* height: 100%; */ /* Let flexbox handle */
+            /* max-height: 280px; */ /* REMOVED */
+            flex-grow: 1; /* Make textarea fill container */
+            resize: none; /* Disable textarea's own resize */
+            border: none; /* Optional: remove border if container handles it */
+            padding: 5px; /* Add some internal padding */
+            overflow-y: auto; /* Allow scrolling within textarea */
+        }
+
+        #tab-one .import-status {
+            margin-top: 10px;
+            position: absolute;
+            bottom: 15px;
+        }
+        
+        /* Tab Two specific styles to maximize space */
+        #tab-two .text-box {
+            height: calc(100vh - 120px);
+            max-height: 850px;
+            width: 100%;
+        }
+        
+        #tab-two .container {
+            gap: 20px;
+            padding: 0 32px;
+            max-width: 100%;
+        }
+        
+        #tab-two #editor-container2 {
+            /* height: 350px; */ /* Removed fixed height */
+            /* margin-bottom: 20px; */ /* Removed margin */
+            flex-grow: 1; /* Added to fill space */
+            display: flex; /* Added for inner Quill elements */
+            flex-direction: column; /* Added for inner Quill elements */
+            overflow: hidden; /* Added to prevent container scrollbars */
+        }
+        
+        
+        #tab-two .output-container {
+            height: calc(100% - 120px);
+            flex-grow: 1;
+        }
+        
+        #tab-two #inputText2 {
+            height: 100%;
+            flex-grow: 1;
+        }
+        
+        #tab-two .import-status {
+            margin-top: 10px;
+            position: absolute;
+            bottom: 15px;
+        }
+        
+        /* AI Button Styles */
+        #aiFormatButton {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        #aiFormatButton svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        #aiFormatButton.loading {
+            background-color: #666;
+            pointer-events: none;
+        }
+        
+        /* AI Loader Animation */
+        .ai-loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: ai-spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes ai-spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Clear button styles */
+        .clear-button {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            display: none;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.2s ease;
+            z-index: 10;
+        }
+        
+        .clear-button:hover {
+            background-color: #c82333;
+        }
+        
+        .clear-button svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* === Resizable Pane Styles === */
+        #editor-pane,
+        #output-pane {
+            flex: 1; /* Start by sharing space */
+            min-height: 100px; /* Minimum height */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevent internal content from causing overflow */
+        }
+        
+        #output-pane {
+             min-height: 150px; /* Needs more space for controls */
+        }
+
+        #resize-handle {
+            height: 8px;
+            background-color: #e0e0e0;
+            cursor: ns-resize;
+            flex-shrink: 0; /* Prevent handle from shrinking */
+            margin: 4px 0;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+        /* === End Resizable Pane Styles === */
     </style>
 </head>
 <body>
@@ -1657,6 +1895,10 @@
                         <h2>
                             <span>Card Preview</span>
                             <div class="heading-actions">
+                                <!-- Added Screenshot Button for Tab 1 -->
+                                <button id="screenshotButtonTab1" title="Download Preview as Image" style="background: none; border: none; padding: 5px; cursor: pointer; display: inline-flex; align-items: center;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="#5f6368"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                </button>
                                 <div class="style-selector">
                                     <select id="cardStyleSelector" class="style-dropdown">
                                         <option value="text-only">Text Only</option>
@@ -3015,41 +3257,56 @@
         // === End Floating Preview Button & Modal Logic ===
 
         // === Screenshot Logic ===
-        const screenshotButton = document.getElementById('screenshotButton');
-        const elementToCapture = document.getElementById('modalCardPreviewContent'); // The card content itself
-        
-        if (screenshotButton && elementToCapture) {
+        const screenshotButton = document.getElementById('screenshotButton'); // Modal button
+        const screenshotButtonTab1 = document.getElementById('screenshotButtonTab1'); // Tab 1 button
+        const modalElementToCapture = document.getElementById('modalCardPreviewContent'); 
+        const tab1ElementToCapture = document.getElementById('cardPreviewContent'); 
+
+        // Reusable function for capture and download
+        function captureAndDownload(element, filename) {
+            if (!element) {
+                console.error("Element to capture not found!");
+                showGlobalError("Cannot capture preview: target element missing.");
+                return;
+            }
+            console.log(`Taking screenshot of ${element.id}...`);
+            const options = {
+                useCORS: true, 
+                scale: 2, 
+                backgroundColor: '#ffffff' 
+            };
+
+            html2canvas(element, options).then(canvas => {
+                const imageData = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = imageData;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                console.log("Screenshot download initiated.");
+            }).catch(err => {
+                console.error("Error taking screenshot:", err);
+                showGlobalError("Failed to capture preview image. See console for details.");
+            });
+        }
+
+        // Listener for Modal Button
+        if (screenshotButton && modalElementToCapture) {
             screenshotButton.addEventListener('click', () => {
-                console.log("Taking screenshot...");
-                // Options for html2canvas
-                const options = {
-                    useCORS: true, // Allows loading cross-origin images/fonts if needed
-                    scale: 2, // Increase scale for better resolution
-                    backgroundColor: '#ffffff' // Explicitly set background to white
-                };
-
-                html2canvas(elementToCapture, options).then(canvas => {
-                    // Create an image data URL
-                    const imageData = canvas.toDataURL('image/png');
-                    
-                    // Create a temporary link to trigger download
-                    const link = document.createElement('a');
-                    link.href = imageData;
-                    link.download = 'card-preview.png'; // Filename for the download
-                    
-                    // Append link to body, click it, then remove it
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    console.log("Screenshot download initiated.");
-
-                }).catch(err => {
-                    console.error("Error taking screenshot:", err);
-                    showGlobalError("Failed to capture preview image. See console for details.");
-                });
+                captureAndDownload(modalElementToCapture, 'modal-card-preview.png');
             });
         } else {
-            console.error("Could not find screenshot button or element to capture.");
+            console.error("Could not find modal screenshot button or element to capture.");
+        }
+
+        // Listener for Tab 1 Button
+        if (screenshotButtonTab1 && tab1ElementToCapture) {
+            screenshotButtonTab1.addEventListener('click', () => {
+                captureAndDownload(tab1ElementToCapture, 'card-preview.png');
+            });
+        } else {
+            console.error("Could not find Tab 1 screenshot button or element to capture.");
         }
         // === End Screenshot Logic ===
 
