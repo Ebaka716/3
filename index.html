@@ -1187,7 +1187,7 @@
         </div>
     </div>
 
-    <div id="copySuccess" class="copy-success">Copied to clipboard!</div>
+    <div id="copySuccess" class="copy-success"></div> <!-- Message set by JS -->
     
     <!-- Import Modal -->
     <div id="importModal" class="modal">
@@ -1817,7 +1817,7 @@
             // console.log("Attempting to copy for Tab 1..."); // DEBUG Removed
             navigator.clipboard.writeText(textToCopy).then(() => {
                 // console.log("Clipboard write successful for Tab 1."); // DEBUG Removed
-                showCopySuccess();
+                showSuccessToast("Copied to clipboard!");
             }).catch(err => {
                 console.error("Failed to copy for Tab 1: ", err); // Keep error logging
             });
@@ -1828,25 +1828,10 @@
             // console.log("Attempting to copy for Tab 2..."); // DEBUG Removed
             navigator.clipboard.writeText(textToCopy).then(() => {
                 // console.log("Clipboard write successful for Tab 2."); // DEBUG Removed
-                showCopySuccess();
+                showSuccessToast("Copied to clipboard!");
             }).catch(err => {
                 console.error("Failed to copy for Tab 2: ", err); // Keep error logging
             });
-        }
-        
-        function showCopySuccess() {
-            // console.log("showCopySuccess called."); // DEBUG Removed
-            const copySuccess = document.getElementById('copySuccess');
-            if (copySuccess) {
-                // console.log("Found copySuccess element. Setting display to block."); // DEBUG Removed
-                copySuccess.style.display = 'block';
-                setTimeout(() => {
-                    // console.log("Hiding copySuccess element."); // DEBUG Removed
-                    copySuccess.style.display = 'none';
-                }, 2000);
-            } else {
-                console.error("Could not find copySuccess element!"); // Keep error logging
-            }
         }
         
         // Card style selector for first tab
@@ -2023,11 +2008,8 @@
                 // Update the preview
                 updatePreviewsAI();
                 
-                // Show success message
-                const statusEl = document.getElementById('importStatus2');
-                statusEl.style.display = 'block';
-                statusEl.textContent = 'Content formatted successfully with AI!';
-                statusEl.className = 'import-status import-success';
+                // Show success message using the toast notification
+                showSuccessToast("AI formatting successful!");
                 
             } catch (error) {
                 console.error('Error formatting with AI:', error);
@@ -2224,6 +2206,20 @@
         function clearGlobalError() {
             const errorContainer = document.getElementById('globalErrorContainer');
             errorContainer.classList.remove('visible');
+        }
+        
+        // Renamed from showCopySuccess and added message parameter
+        function showSuccessToast(message) {
+            const toastElement = document.getElementById('copySuccess'); // Keep ID or make generic?
+            if (toastElement) {
+                toastElement.innerHTML = message; // Set the message dynamically
+                toastElement.style.display = 'block';
+                setTimeout(() => {
+                    toastElement.style.display = 'none';
+                }, 2000);
+            } else {
+                console.error("Could not find toast element (copySuccess)!"); // Keep error logging
+            }
         }
     </script>
 </body>
