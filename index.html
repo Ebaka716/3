@@ -1656,6 +1656,10 @@
             <div class="text-box" style="height: auto; box-shadow: none; padding: 0;"> 
                  <h2>
                     <div class="heading-actions">
+                        <!-- Screenshot Button -->
+                        <button id="screenshotButton" title="Download Preview as Image" style="background: none; border: none; padding: 5px; cursor: pointer; display: inline-flex; align-items: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="#5f6368"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        </button>
                         <div class="style-selector">
                             <select id="modalCardStyleSelector" class="style-dropdown">
                                 <option value="text-only">Text Only</option>
@@ -1705,6 +1709,8 @@
     <!-- Excel and Word parsing libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <!-- Added html2canvas library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
         // Initialize Quill editor
@@ -2760,6 +2766,45 @@
             console.error("Could not find all required elements for modal preview.");
         }
         // === End Floating Preview Button & Modal Logic ===
+
+        // === Screenshot Logic ===
+        const screenshotButton = document.getElementById('screenshotButton');
+        const elementToCapture = document.getElementById('modalCardPreviewContent'); // The card content itself
+        
+        if (screenshotButton && elementToCapture) {
+            screenshotButton.addEventListener('click', () => {
+                console.log("Taking screenshot...");
+                // Options for html2canvas
+                const options = {
+                    useCORS: true, // Allows loading cross-origin images/fonts if needed
+                    scale: 2, // Increase scale for better resolution
+                    backgroundColor: '#ffffff' // Explicitly set background to white
+                };
+
+                html2canvas(elementToCapture, options).then(canvas => {
+                    // Create an image data URL
+                    const imageData = canvas.toDataURL('image/png');
+                    
+                    // Create a temporary link to trigger download
+                    const link = document.createElement('a');
+                    link.href = imageData;
+                    link.download = 'card-preview.png'; // Filename for the download
+                    
+                    // Append link to body, click it, then remove it
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    console.log("Screenshot download initiated.");
+
+                }).catch(err => {
+                    console.error("Error taking screenshot:", err);
+                    showGlobalError("Failed to capture preview image. See console for details.");
+                });
+            });
+        } else {
+            console.error("Could not find screenshot button or element to capture.");
+        }
+        // === End Screenshot Logic ===
 
     </script>
 </body>
