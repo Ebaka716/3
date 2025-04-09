@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Format Preview</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet" />
+    <!-- Quill CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        /* Fidelity Sans Font */
+        @font-face {
+            font-family: 'Fidelity Sans';
+            src: url('https://www.fidelity.com/webcontent/fonts/fidelity-sans/v2-2021/regular/FidelitySans-Regular.woff2') format('woff2'),
+                 url('https://www.fidelity.com/webcontent/fonts/fidelity-sans/v2-2021/regular/FidelitySans-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: 'Fidelity Sans';
+            src: url('https://www.fidelity.com/webcontent/fonts/fidelity-sans/v2-2021/bold/FidelitySans-Bold.woff2') format('woff2'),
+                 url('https://www.fidelity.com/webcontent/fonts/fidelity-sans/v2-2021/bold/FidelitySans-Bold.woff') format('woff');
+            font-weight: bold;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        /* Typography settings */
+        :root {
+            --fidelity-line-height: 1.5;
+            --fidelity-letter-spacing: -0.01em;
+            --fidelity-header-letter-spacing: -0.02em;
+        }
+        
+        /* Apply box-sizing globally */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Fidelity Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            line-height: var(--fidelity-line-height);
+            letter-spacing: var(--fidelity-letter-spacing);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            text-align: center;
+            padding: 15px 20px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .app-container {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+        .nav-sidebar {
+            width: 220px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        .nav-sidebar.collapsed {
+            width: 50px;
+        }
+        .nav-sidebar.collapsed .nav-item-text {
+            display: none;
+        }
+        .nav-sidebar.collapsed .nav-item {
+            text-align: center;
+            padding: 12px 0;
+        }
+        .nav-sidebar.collapsed .nav-item-icon {
+            margin-right: 0;
+        }
+        .nav-sidebar.collapsed .sidebar-toggle {
+            margin: 0 auto 20px auto;
+        }
+        .sidebar-toggle {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+            z-index: 10;
+            margin: 0 20px 20px auto;
+        }
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .sidebar-toggle-icon {
+            font-size: 16px;
+        }
+        .nav-item-text {
+            transition: opacity 0.2s ease;
+        }
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .nav-item.active {
+            border-left-color: #6200ea;
+            background-color: rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+        .nav-item-icon {
+            margin-right: 10px;
+            opacity: 0.8;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .container.ai-view {
+            grid-template-columns: 1fr;
+        }
+        .view-container {
+            display: none;
+        }
+        .view-container.active {
+            display: block;
+        }
+        
+        /* Error notification styling */
+        .error-container {
+            background-color: #fff3f3;
+            border-left: 4px solid #dc3545;
+            margin: 0 32px 20px 32px;
+            padding: 12px 16px;
+            border-radius: 4px;
+            display: none;
+            font-size: 14px;
+            color: #721c24;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .error-container.visible {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .error-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .error-message {
+            margin: 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .text-box {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 620px;
+            display: flex;
+            flex-direction: column;
+        }
+        .text-box h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            letter-spacing: var(--fidelity-header-letter-spacing);
+            width: 100%;
+        }
+        .text-box h2 span {
+            display: inline-block;
+        }
+        .heading-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 130px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: 'Fidelity Sans', inherit;
+            flex-shrink: 0;
+            line-height: var(--fidelity-line-height);
+            letter-spacing: var(--fidelity-letter-spacing);
+        }
+        .preview-box {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 400px;
+            overflow-y: auto;
+            overflow-x: auto;
+            position: relative;
+            flex-shrink: 0;
+            width: auto;
+            max-width: 100%;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            flex-shrink: 0;
+            font-family: 'Fidelity Sans', inherit;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .header h1 {
+            color: #333;
+            letter-spacing: var(--fidelity-header-letter-spacing);
+            font-size: 1.5em;
+            margin: 0 0 5px 0;
+        }
+        .header p {
+            color: #666;
+            margin: 0;
+            font-size: 0.9em;
+        }
+        .copy-button {
+            background-color: #6c757d;
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        .copy-button:hover {
+            background-color: #5a6268;
+        }
+        .export-button {
+            background-color: #17a2b8;
+        }
+        .export-button:hover {
+            background-color: #138496;
+        }
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            display: none;
+        }
+        pre {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: none !important;
+            max-width: 100% !important;
+            overflow-x: auto !important;
+        }
+        code {
+            font-family: 'Fira Code', monospace;
+            display: block;
+            max-width: 100% !important;
+            overflow-x: auto !important;
+        }
+        .preview-container {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            max-width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+        .toggle-container {
+            display: flex;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+        .toggle-button {
+            padding: 6px 12px;
+            background-color: #eee;
+            color: #333;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            outline: none;
+            flex: 1;
+        }
+        .toggle-button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .toggle-button:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+        .toggle-button:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+        .preview-content {
+            display: none;
+            max-width: 100%;
+            height: 100%;
+        }
+        .preview-content.active {
+            display: block;
+            max-width: 100%;
+            height: 100%;
+        }
+        .html-code {
+            white-space: pre;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-wrap: normal;
+            word-break: keep-all;
+        }
+        
+        /* Override Prism.js styles to prevent expansion */
+        .token {
+            white-space: pre;
+            display: inline;
+        }
+        
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        
+        .tab {
+            padding: 5px 10px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+        }
+        
+        .tab.active {
+            border-color: #ddd;
+            border-radius: 4px 4px 0 0;
+            background-color: white;
+            position: relative;
+        }
+        
+        .tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: white;
+        }
+        
+        .tab-content {
+            display: none;
+            height: 100%;
+        }
+        
+        .tab-content.active {
+            display: block;
+            height: 100%;
+        }
+        
+        .rendered-html {
+            max-width: 100%;
+            overflow-wrap: break-word;
+        }
+        
+        /* Quill editor custom styles */
+        #editor-container {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        
+        .ql-editor {
+            font-size: 14px;
+            line-height: var(--fidelity-line-height);
+            font-family: 'Fidelity Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            letter-spacing: var(--fidelity-letter-spacing);
+        }
+        
+        .button-bar {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        
+        .format-actions {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        
+        .raw-text {
+            display: none;
+        }
+        
+        /* Card Preview Styles */
+        .card-preview-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background-color: #f0f0f0;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+        
+        .card-preview {
+            width: 450px;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin: 0 auto;
+            box-sizing: border-box;
+            overflow-wrap: break-word;
+            font-family: 'Fidelity Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: var(--fidelity-line-height);
+            letter-spacing: var(--fidelity-letter-spacing);
+        }
+        
+        .card-preview img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .format-toggle {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 0 15px 0;
+        }
+        
+        .section-label {
+            font-weight: bold;
+            margin-top: 5px;
+            margin-bottom: 3px;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: var(--fidelity-header-letter-spacing);
+        }
+        
+        .output-container {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .copy-corner-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+            background-color: rgba(108, 117, 125, 0.8);
+            border-radius: 4px;
+            padding: 5px 10px;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .copy-corner-button:hover {
+            background-color: rgba(90, 98, 104, 0.9);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+        }
+        
+        .return-icon {
+            margin-right: 8px;
+            font-weight: bold;
+            font-size: 18px;
+            transform: scaleX(-1);
+        }
+        
+        .intent-label {
+            font-weight: bold;
+            color: #333;
+            letter-spacing: var(--fidelity-header-letter-spacing);
+        }
+        
+        .card-content {
+            margin-top: 16px;
+            font-family: 'Fidelity Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: var(--fidelity-line-height);
+            letter-spacing: var(--fidelity-letter-spacing);
+        }
+        
+        /* Apply Fidelity typography to all headings */
+        h1, h2, h3, h4, h5, h6 {
+            letter-spacing: var(--fidelity-header-letter-spacing);
+            line-height: 1.3;
+        }
+        
+        /* Apply Fidelity typography to paragraph elements in the preview */
+        .card-content p {
+            margin-bottom: 1em;
+            line-height: var(--fidelity-line-height);
+            letter-spacing: var(--fidelity-letter-spacing);
+            font-size: 14px;
+        }
+        
+        #inputText {
+            flex-grow: 1;
+            margin: 0;
+        }
+        
+        .import-button {
+            background-color: #28a745;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .import-button:hover {
+            background-color: #218838;
+        }
+        
+        .import-button svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .import-status {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .import-success {
+            color: #28a745;
+        }
+        
+        .import-error {
+            color: #dc3545;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 800px; /* Changed from 400px to 800px */
+            max-width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .modal-close {
+            cursor: pointer;
+            font-size: 1.5em;
+            line-height: 1;
+            background: transparent;
+            border: none;
+            color: #999;
+        }
+        
+        .modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .modal-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-option:hover {
+            background-color: #f0f0f0;
+            border-color: #bbb;
+        }
+        
+        .modal-option.selected {
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+        }
+        
+        .modal-option-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        
+        .modal-option-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .modal-option-text {
+            flex: 1;
+        }
+        
+        .modal-option-title {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .modal-option-desc {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-button {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            border: none;
+        }
+        
+        .modal-button-cancel {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        
+        .modal-button-proceed {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .style-selector {
+            margin-left: auto;
+            min-width: 140px;
+            position: relative;
+        }
+        
+        select.style-dropdown {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 30px 5px 10px;
+            font-size: 0.85em;
+            cursor: pointer;
+            font-family: inherit;
+            width: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 12px;
+        }
+        
+        select.style-dropdown:hover {
+            background-color: #e6e6e6;
+        }
+        
+        select.style-dropdown:focus {
+            outline: none;
+            border-color: #aaa;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+        
+        /* Card Preview Styles */
+        .card-pill-container {
+            display: flex;
+            gap: 8px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .card-pill {
+            display: inline-block;
+            padding: 6px 14px;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #555;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .card-pill:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .card-pill-primary {
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+            color: #0d47a1;
+        }
+        
+        .card-pill-primary:hover {
+            background-color: #bbdefb;
+            color: #0d47a1;
+        }
+        
+        .card-pill-secondary {
+            background-color: #f3e5f5;
+            border-color: #ce93d8;
+            color: #7b1fa2;
+        }
+        
+        .card-pill-secondary:hover {
+            background-color: #e1bee7;
+            color: #7b1fa2;
+        }
+        
+        /* Card style variations */
+        .card-preview.text-only .card-header {
+            display: none;
+        }
+        
+        .card-preview.with-pills .card-pill-container {
+            display: flex;
+        }
+        
+        .card-preview:not(.with-pills) .card-pill-container {
+            display: none;
+        }
+        
+        /* Make section label items align better */
+        .section-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Tab One specific styles to maximize space */
+        #tab-one .text-box {
+            height: 620px;
+            max-height: 620px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        #tab-one .container {
+            gap: 20px;
+            padding: 0 32px;
+            max-width: 100%;
+        }
+        
+        #tab-one #editor-container {
+            height: 250px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        
+        #tab-one .output-container {
+            height: 280px;
+            max-height: 280px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        
+        #tab-one #inputText {
+            height: 100%;
+            width: 100%;
+            max-height: 280px;
+        }
+        
+        #tab-one .import-status {
+            margin-top: 10px;
+            position: absolute;
+            bottom: 15px;
+        }
+        
+        /* Tab Two specific styles to maximize space */
+        #tab-two .text-box {
+            height: calc(100vh - 120px);
+            max-height: 850px;
+            width: 100%;
+        }
+        
+        #tab-two .container {
+            gap: 20px;
+            padding: 0 32px;
+            max-width: 100%;
+        }
+        
+        #tab-two #editor-container2 {
+            height: 350px;
+            margin-bottom: 20px;
+        }
+        
+        
+        #tab-two .output-container {
+            height: calc(100% - 120px);
+            flex-grow: 1;
+        }
+        
+        #tab-two #inputText2 {
+            height: 100%;
+            flex-grow: 1;
+        }
+        
+        #tab-two .import-status {
+            margin-top: 10px;
+            position: absolute;
+            bottom: 15px;
+        }
+        
+        /* AI Button Styles */
+        #aiFormatButton {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        #aiFormatButton svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        #aiFormatButton.loading {
+            background-color: #666;
+            pointer-events: none;
+        }
+        
+        /* AI Loader Animation */
+        .ai-loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: ai-spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes ai-spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Clear button styles */
+        .clear-button {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            display: none;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.2s ease;
+            z-index: 10;
+        }
+        
+        .clear-button:hover {
+            background-color: #c82333;
+        }
+        
+        .clear-button svg {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Content Format Preview</h1>
+        <p>Create and preview your content in different formats</p>
+    </div>
+    
+    <!-- Global error notification container -->
+    <div id="globalErrorContainer" class="error-container">
+        <div class="error-title">Error</div>
+        <p class="error-message" id="globalErrorMessage"></p>
+    </div>
+    
+    <div class="app-container">
+        <div class="nav-sidebar">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <svg class="sidebar-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <div class="nav-item active" data-view="tab-one">
+                <span class="nav-item-icon">✏️</span>
+                <span class="nav-item-text">Content Editor</span>
+            </div>
+            <div class="nav-item" data-view="tab-two">
+                <span class="nav-item-icon">🤖</span>
+                <span class="nav-item-text">AI Format</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Tab One View -->
+            <div id="tab-one" class="view-container active">
+                <div class="container">
+                    <div class="text-box">
+                        <h2>
+                            <span>Content Editor</span>
+                            <div class="heading-actions">
+                                <button id="importButton" class="import-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    Import File
+                                </button>
+                                <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls,.doc,.docx">
+                            </div>
+                        </h2>
+                        
+                        <!-- Quill editor container with relative positioning -->
+                        <div style="position: relative; flex-grow: 1; display: flex; flex-direction: column;">
+                            <div id="editor-container"></div>
+                            
+                            <!-- Clear button positioned within editor area -->
+                            <button id="clearButton" class="clear-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                                Clear Content
+                            </button>
+                        </div>
+                        
+                        <!-- Hidden textarea to store raw content -->
+                        <textarea id="rawContent" class="raw-text"></textarea>
+                        
+                        <!-- Import options - remove section but keep status -->
+                        <div id="importStatus" class="import-status"></div>
+                        
+                        <!-- Format toggle -->
+                        <div class="section-label">
+                            Display Options
+                            <button id="copyButton" class="copy-button" onclick="copyCurrentFormat()">Copy HTML to Clipboard</button>
+                        </div>
+                        <div class="toggle-container">
+                            <button id="htmlToggle" class="toggle-button active" onclick="toggleFormat('html')">Show HTML</button>
+                            <button id="markdownToggle" class="toggle-button" onclick="toggleFormat('markdown')">Show Markdown</button>
+                        </div>
+                        
+                        <!-- Raw text output -->
+                        <div class="output-container">
+                            <textarea id="inputText" placeholder="Formatted code will appear here..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="text-box">
+                        <h2>
+                            <span>Card Preview</span>
+                            <div class="heading-actions">
+                                <div class="style-selector">
+                                    <select id="cardStyleSelector" class="style-dropdown">
+                                        <option value="text-only">Text Only</option>
+                                        <option value="with-intent" selected>With User Intent</option>
+                                        <option value="with-pills">With Intent & Pills</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </h2>
+                        <div class="preview-container">
+                            <!-- Card Preview -->
+                            <div id="cardPreview" class="preview-content active preview-box">
+                                <div class="card-preview-container">
+                                    <div class="card-preview with-intent" id="cardPreviewContent">
+                                        <div class="card-header">
+                                            <span class="return-icon">↩</span>
+                                            <span class="intent-label">User Intent</span>
+                                        </div>
+                                        <div class="card-content" id="cardContentArea"></div>
+                                        <div class="card-pill-container">
+                                            <span class="card-pill">Option 1</span>
+                                            <span class="card-pill card-pill-primary">Option 2</span>
+                                            <span class="card-pill card-pill-secondary">Option 3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Two View (modified layout) -->
+            <div id="tab-two" class="view-container">
+                <div class="container">
+                    <div class="text-box">
+                        <h2>
+                            <span>Content Editor</span>
+                            <div class="heading-actions">
+                                <button id="importButton2" class="import-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    Import File
+                                </button>
+                                <button id="aiFormatButton" class="import-button" style="background-color: #6200ea;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                                        <path d="M9 21V9"></path>
+                                        <path d="M15 9v3"></path>
+                                        <path d="M15 15v6"></path>
+                                        <circle cx="15" cy="12" r="0.5"></circle>
+                                        <circle cx="15" cy="18" r="0.5"></circle>
+                                    </svg>
+                                    Format with AI
+                                </button>
+                                <button id="aiConfigButton" style="background: none; border: none; padding: 8px 5px; cursor: pointer; margin-left: 0;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#6200ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                                        <circle cx="12" cy="12" r="2"></circle>
+                                        <path d="M12 6V4"></path>
+                                        <path d="M12 20v-2"></path>
+                                        <path d="M6 12H4"></path>
+                                        <path d="M20 12h-2"></path>
+                                        <path d="M16.24 7.76l-1.42 1.42"></path>
+                                        <path d="M9.18 14.82l-1.42 1.42"></path>
+                                        <path d="M16.24 16.24l-1.42-1.42"></path>
+                                        <path d="M9.18 9.18l-1.42-1.42"></path>
+                                    </svg>
+                                </button>
+                                <input type="file" id="fileInput2" class="file-input" accept=".xlsx,.xls,.doc,.docx">
+                            </div>
+                        </h2>
+                        
+                        <!-- Quill editor container with relative positioning -->
+                        <div style="position: relative; flex-grow: 1; display: flex; flex-direction: column;">
+                            <div id="editor-container2"></div>
+                        </div>
+                        
+                        <!-- Hidden textarea to store raw content -->
+                        <textarea id="rawContent2" class="raw-text"></textarea>
+                        
+                        <!-- Import options - remove section but keep status -->
+                        <div id="importStatus2" class="import-status"></div>
+                        
+                    </div> <!-- Moved this closing tag here to end the Content Editor text-box -->
+                        
+                    <!-- This Display Options text-box is now a sibling -->
+                    <div class="text-box"> 
+                        <h2>
+                            <span>Display Options</span>
+                            <button id="copyButton2" class="copy-button" onclick="copyCurrentFormat2()">Copy HTML to Clipboard</button>
+                        </h2>
+                        
+                        <div class="toggle-container">
+                            <button id="htmlToggle2" class="toggle-button active" onclick="toggleFormat2('html')">Show HTML</button>
+                            <button id="markdownToggle2" class="toggle-button" onclick="toggleFormat2('markdown')">Show Markdown</button>
+                        </div>
+                        
+                        <!-- Raw text output -->
+                        <div class="output-container">
+                            <textarea id="inputText2" placeholder="Formatted code will appear here..."></textarea>
+                        </div>
+                    </div> <!-- This was the original location of the closing tag -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="copySuccess" class="copy-success">Copied to clipboard!</div>
+    
+    <!-- Import Modal -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Select Import Format</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-options">
+                <div class="modal-option" data-import-mode="word">
+                    <div class="modal-option-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#2b579a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="modal-option-text">
+                        <div class="modal-option-title">Word Document</div>
+                        <div class="modal-option-desc">Import formatted text from Word (.docx, .doc)</div>
+                    </div>
+                </div>
+                <div class="modal-option" data-import-mode="excel-table">
+                    <div class="modal-option-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="3" y1="15" x2="21" y2="15"></line>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                            <line x1="15" y1="3" x2="15" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="modal-option-text">
+                        <div class="modal-option-title">Excel (Table)</div>
+                        <div class="modal-option-desc">Import entire worksheet as HTML table</div>
+                    </div>
+                </div>
+                <div class="modal-option" data-import-mode="excel-cell">
+                    <div class="modal-option-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <rect x="9" y="9" width="6" height="6"></rect>
+                        </svg>
+                    </div>
+                    <div class="modal-option-text">
+                        <div class="modal-option-title">Excel (Single Cell)</div>
+                        <div class="modal-option-desc">Import content from a single cell (A1)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-button modal-button-cancel" id="modalCancel">Cancel</button>
+                <button class="modal-button modal-button-proceed" id="modalProceed">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Config Modal -->
+    <div id="aiConfigModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">AI Configuration</h3>
+                <button class="modal-close" id="aiModalClose">&times;</button>
+            </div>
+            <div style="padding: 16px;">
+                <div style="margin-bottom: 16px;">
+                    <label for="systemPrompt" style="display: block; margin-bottom: 6px; font-weight: 500;">System Prompt</label>
+                    <textarea id="systemPrompt" rows="5" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" placeholder="Enter instructions for the AI on how to format content...">You are a helpful assistant that formats text into clear, structured content. Create organized sections with headings, bullet points, and numbered lists as appropriate.</textarea>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label for="aiModel" style="display: block; margin-bottom: 6px; font-weight: 500;">AI Model</label>
+                    <select id="aiModel" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                        <option value="gpt-4">GPT-4 (High quality, more expensive)</option>
+                        <option value="gpt-3.5-turbo" selected>GPT-3.5 Turbo (Faster, less expensive)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label for="temperature" style="display: block; margin-bottom: 6px; font-weight: 500;">Temperature: <span id="tempValue">0.7</span></label>
+                    <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7" style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
+                        <span>More focused</span>
+                        <span>More creative</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label for="apiKey" style="display: block; margin-bottom: 6px; font-weight: 500;">OpenAI API Key</label>
+                    <input type="password" id="apiKey" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" placeholder="sk-...">
+                    <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                        Your API key is stored locally in your browser and never sent to our servers.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-button modal-button-cancel" id="aiModalCancel">Cancel</button>
+                <button class="modal-button modal-button-proceed" id="aiModalSave">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Library Scripts -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@12/dist/markdown-it.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-markup.min.js"></script>
+    <!-- Excel and Word parsing libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    
+    <script>
+        // Initialize Quill editor
+        var quill = new Quill('#editor-container', {
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                    [{ 'indent': '-1' }, { 'indent': '+1' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Compose your content here...',
+            theme: 'snow'
+        });
+        
+        // Initialize second Quill editor for Tab Two
+        var quill2 = new Quill('#editor-container2', {
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                    [{ 'indent': '-1' }, { 'indent': '+1' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Compose your content here...',
+            theme: 'snow'
+        });
+        
+        // Initialize markdown-it
+        var md = window.markdownit();
+        
+        // Initialize Showdown
+        var converter = new showdown.Converter();
+        
+        // Track current format
+        var currentFormat = 'html';
+        var currentFormat2 = 'html';
+        
+        // Import mode
+        var importMode = 'word'; // Default import mode
+        
+        // Modal Elements
+        const importModal = document.getElementById('importModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalCancel = document.getElementById('modalCancel');
+        const modalProceed = document.getElementById('modalProceed');
+        const modalOptions = document.querySelectorAll('.modal-option');
+        
+        // View switching elements
+        const navItems = document.querySelectorAll('.nav-item');
+        const viewContainers = document.querySelectorAll('.view-container');
+        
+        // Handle view switching
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Get the view to show
+                const viewToShow = this.getAttribute('data-view');
+                
+                // Update active nav item
+                navItems.forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Update visible view
+                viewContainers.forEach(viewContainer => {
+                    viewContainer.classList.remove('active');
+                });
+                document.getElementById(viewToShow).classList.add('active');
+            });
+        });
+        
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.nav-sidebar');
+        
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            
+            // Change toggle button icon based on sidebar state
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggle.innerHTML = `
+                    <svg class="sidebar-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                `;
+            } else {
+                sidebarToggle.innerHTML = `
+                    <svg class="sidebar-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                `;
+            }
+        });
+        
+        // Update previews when the editor content changes
+        quill.on('text-change', function() {
+            updatePreviews();
+        });
+        
+        // Update previews for second editor
+        quill2.on('text-change', function() {
+            updatePreviews2();
+        });
+        
+        // Initialize file import functionality
+        document.getElementById('importButton').addEventListener('click', function() {
+            showImportModal();
+        });
+        
+        // Initialize file import for second tab
+        document.getElementById('importButton2').addEventListener('click', function() {
+            showImportModal();
+        });
+        
+        // Close modal when X is clicked
+        modalClose.addEventListener('click', closeImportModal);
+        
+        // Close modal when Cancel is clicked
+        modalCancel.addEventListener('click', closeImportModal);
+        
+        // Handle modal option selection
+        modalOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options
+                modalOptions.forEach(opt => opt.classList.remove('selected'));
+                
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                
+                // Set import mode
+                importMode = this.getAttribute('data-import-mode');
+            });
+        });
+        
+        // Proceed with file selection
+        modalProceed.addEventListener('click', function() {
+            closeImportModal();
+            
+            // Set accept attribute based on selected import mode
+            const activeView = document.querySelector('.view-container.active').id;
+            const fileInput = activeView === 'tab-one' ? 
+                document.getElementById('fileInput') : 
+                document.getElementById('fileInput2');
+                
+            if (importMode === 'word') {
+                fileInput.setAttribute('accept', '.doc,.docx');
+            } else {
+                fileInput.setAttribute('accept', '.xlsx,.xls');
+            }
+            
+            // Trigger file input
+            fileInput.click();
+        });
+        
+        // Open import modal
+        function showImportModal() {
+            importModal.style.display = 'flex';
+            
+            // Set default selected option
+            modalOptions.forEach(option => {
+                if (option.getAttribute('data-import-mode') === importMode) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+        
+        // Close import modal
+        function closeImportModal() {
+            importModal.style.display = 'none';
+        }
+        
+        // Handle file input change for first tab
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const statusEl = document.getElementById('importStatus');
+            statusEl.style.display = 'block';
+            statusEl.textContent = 'Importing file...';
+            statusEl.className = 'import-status';
+            
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            
+            // Check if file type matches selected import mode
+            if ((fileExt === 'xlsx' || fileExt === 'xls') && importMode.startsWith('excel')) {
+                processExcelFile(file);
+            } else if ((fileExt === 'doc' || fileExt === 'docx') && importMode === 'word') {
+                processWordFile(file);
+            } else {
+                statusEl.textContent = 'Error: File type does not match selected import mode';
+                statusEl.classList.add('import-error');
+            }
+        });
+        
+        // Handle file input change for second tab
+        document.getElementById('fileInput2').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const statusEl = document.getElementById('importStatus2');
+            statusEl.style.display = 'block';
+            statusEl.textContent = 'Importing file...';
+            statusEl.className = 'import-status';
+            
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            
+            // Check if file type matches selected import mode
+            if ((fileExt === 'xlsx' || fileExt === 'xls') && importMode.startsWith('excel')) {
+                processExcelFile2(file);
+            } else if ((fileExt === 'doc' || fileExt === 'docx') && importMode === 'word') {
+                processWordFile2(file);
+            } else {
+                statusEl.textContent = 'Error: File type does not match selected import mode';
+                statusEl.className = 'import-status import-error';
+            }
+        });
+        
+        function processExcelFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Get first worksheet
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    let content = '';
+                    if (importMode === 'excel-cell') {
+                        // Get cell A1 content or first non-empty cell
+                        const cellAddress = 'A1'; // Default cell
+                        const cell = firstSheet[cellAddress];
+                        content = cell ? cell.v : '';
+                    } else {
+                        // Convert to HTML table
+                        content = XLSX.utils.sheet_to_html(firstSheet);
+                    }
+                    
+                    // Insert into Quill editor
+                    quill.clipboard.dangerouslyPasteHTML(content);
+                    
+                    // Show success message
+                    const statusEl = document.getElementById('importStatus');
+                    statusEl.textContent = 'File imported successfully!';
+                    statusEl.className = 'import-status import-success';
+                    
+                    // Clear file input
+                    document.getElementById('fileInput').value = '';
+                    
+                    // Update previews
+                    updatePreviews();
+                } catch (error) {
+                    console.error('Error parsing Excel file:', error);
+                    const statusEl = document.getElementById('importStatus');
+                    statusEl.textContent = 'Error importing Excel file: ' + error.message;
+                    statusEl.className = 'import-status import-error';
+                    
+                    // Show global error message
+                    showGlobalError('Error importing Excel file: ' + error.message);
+                }
+            };
+            reader.onerror = function() {
+                const statusEl = document.getElementById('importStatus');
+                statusEl.textContent = 'Error reading file';
+                statusEl.className = 'import-status import-error';
+                
+                // Show global error message
+                showGlobalError('Error reading file');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function processExcelFile2(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Get first worksheet
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    let content = '';
+                    if (importMode === 'excel-cell') {
+                        // Get cell A1 content or first non-empty cell
+                        const cellAddress = 'A1'; // Default cell
+                        const cell = firstSheet[cellAddress];
+                        content = cell ? cell.v : '';
+                    } else {
+                        // Convert to HTML table
+                        content = XLSX.utils.sheet_to_html(firstSheet);
+                    }
+                    
+                    // Insert into second Quill editor
+                    quill2.clipboard.dangerouslyPasteHTML(content);
+                    
+                    // Show success message
+                    const statusEl = document.getElementById('importStatus2');
+                    statusEl.textContent = 'File imported successfully!';
+                    statusEl.className = 'import-status import-success';
+                    
+                    // Clear file input
+                    document.getElementById('fileInput2').value = '';
+                    
+                    // Update previews
+                    updatePreviews2();
+                } catch (error) {
+                    console.error('Error parsing Excel file:', error);
+                    const statusEl = document.getElementById('importStatus2');
+                    statusEl.textContent = 'Error importing Excel file: ' + error.message;
+                    statusEl.className = 'import-status import-error';
+                    
+                    // Show global error message
+                    showGlobalError('Error importing Excel file: ' + error.message);
+                }
+            };
+            reader.onerror = function() {
+                const statusEl = document.getElementById('importStatus2');
+                statusEl.textContent = 'Error reading file';
+                statusEl.className = 'import-status import-error';
+                
+                // Show global error message
+                showGlobalError('Error reading file');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function processWordFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                mammoth.convertToHtml({ arrayBuffer: e.target.result })
+                    .then(function(result) {
+                        // Insert into Quill editor
+                        quill.clipboard.dangerouslyPasteHTML(result.value);
+                        
+                        // Show success message
+                        const statusEl = document.getElementById('importStatus');
+                        statusEl.textContent = 'Word document imported successfully!';
+                        statusEl.className = 'import-status import-success';
+                        
+                        // Clear file input
+                        document.getElementById('fileInput').value = '';
+                        
+                        // Update previews
+                        updatePreviews();
+                        
+                        // Log any warnings
+                        if (result.messages.length > 0) {
+                            console.warn('Warnings during Word import:', result.messages);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error parsing Word file:', error);
+                        const statusEl = document.getElementById('importStatus');
+                        statusEl.textContent = 'Error importing Word file: ' + error.message;
+                        statusEl.className = 'import-status import-error';
+                    });
+            };
+            reader.onerror = function() {
+                const statusEl = document.getElementById('importStatus');
+                statusEl.textContent = 'Error reading file';
+                statusEl.className = 'import-status import-error';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function processWordFile2(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                mammoth.convertToHtml({ arrayBuffer: e.target.result })
+                    .then(function(result) {
+                        // Insert into second Quill editor
+                        quill2.clipboard.dangerouslyPasteHTML(result.value);
+                        
+                        // Show success message
+                        const statusEl = document.getElementById('importStatus2');
+                        statusEl.textContent = 'Word document imported successfully!';
+                        statusEl.className = 'import-status import-success';
+                        
+                        // Clear file input
+                        document.getElementById('fileInput2').value = '';
+                        
+                        // Update previews
+                        updatePreviews2();
+                        
+                        // Log any warnings
+                        if (result.messages.length > 0) {
+                            console.warn('Warnings during Word import:', result.messages);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error parsing Word file:', error);
+                        const statusEl = document.getElementById('importStatus2');
+                        statusEl.textContent = 'Error importing Word file: ' + error.message;
+                        statusEl.className = 'import-status import-error';
+                    });
+            };
+            reader.onerror = function() {
+                const statusEl = document.getElementById('importStatus2');
+                statusEl.textContent = 'Error reading file';
+                statusEl.className = 'import-status import-error';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function updatePreviews() {
+            // Get HTML from Quill
+            var html = quill.root.innerHTML;
+            
+            // Update Card Preview
+            const cardContentArea = document.getElementById('cardContentArea');
+            cardContentArea.innerHTML = html;
+            
+            // Update format display based on current selection
+            updateFormatDisplay();
+            
+            // Store raw content
+            document.getElementById('rawContent').value = html;
+        }
+        
+        function updatePreviews2() {
+            // Get HTML from second Quill
+            var html = quill2.root.innerHTML;
+            
+            // Update format display based on current selection
+            updateFormatDisplay2();
+            
+            // Store raw content
+            document.getElementById('rawContent2').value = html;
+        }
+        
+        function toggleFormat(format) {
+            // Update toggle buttons
+            document.getElementById('htmlToggle').classList.toggle('active', format === 'html');
+            document.getElementById('markdownToggle').classList.toggle('active', format === 'markdown');
+            
+            // Save current format
+            currentFormat = format;
+            
+            // Update the display
+            updateFormatDisplay();
+            
+            // Update copy button text
+            updateCopyButtonText();
+        }
+        
+        function toggleFormat2(format) {
+            // Update toggle buttons
+            document.getElementById('htmlToggle2').classList.toggle('active', format === 'html');
+            document.getElementById('markdownToggle2').classList.toggle('active', format === 'markdown');
+            
+            // Save current format
+            currentFormat2 = format;
+            
+            // Update the display
+            updateFormatDisplay2();
+            
+            // Update copy button text
+            updateCopyButtonText2();
+        }
+        
+        function updateFormatDisplay() {
+            var html = quill.root.innerHTML;
+            
+            if (currentFormat === 'html') {
+                document.getElementById('inputText').value = html;
+            } else {
+                var markdown = new showdown.Converter().makeMarkdown(html);
+                document.getElementById('inputText').value = markdown;
+            }
+        }
+        
+        function updateFormatDisplay2() {
+            var html = quill2.root.innerHTML;
+            
+            if (currentFormat2 === 'html') {
+                document.getElementById('inputText2').value = html;
+            } else {
+                var markdown = new showdown.Converter().makeMarkdown(html);
+                document.getElementById('inputText2').value = markdown;
+            }
+        }
+        
+        function updateCopyButtonText() {
+            var copyButton = document.getElementById('copyButton');
+            if (currentFormat === 'html') {
+                copyButton.textContent = 'Copy HTML to Clipboard';
+            } else {
+                copyButton.textContent = 'Copy Markdown to Clipboard';
+            }
+        }
+        
+        function updateCopyButtonText2() {
+            var copyButton = document.getElementById('copyButton2');
+            if (currentFormat2 === 'html') {
+                copyButton.textContent = 'Copy HTML to Clipboard';
+            } else {
+                copyButton.textContent = 'Copy Markdown to Clipboard';
+            }
+        }
+        
+        function copyCurrentFormat() {
+            var textToCopy = document.getElementById('inputText').value;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showCopySuccess();
+            });
+        }
+        
+        function copyCurrentFormat2() {
+            var textToCopy = document.getElementById('inputText2').value;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showCopySuccess();
+            });
+        }
+        
+        function showCopySuccess() {
+            const copySuccess = document.getElementById('copySuccess');
+            copySuccess.style.display = 'block';
+            setTimeout(() => {
+                copySuccess.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Card style selector for first tab
+        document.getElementById('cardStyleSelector').addEventListener('change', function() {
+            const selectedStyle = this.value;
+            const cardPreview = document.getElementById('cardPreviewContent');
+            
+            // Remove all styles first
+            cardPreview.classList.remove('text-only', 'with-intent', 'with-pills');
+            
+            // Add the selected style
+            cardPreview.classList.add(selectedStyle);
+        });
+        
+        // Initialize with sample content
+        window.onload = function() {
+            // Initialize first tab
+            quill.root.innerHTML = "<p>Start typing or paste your content here.</p><p>Use the formatting tools above to style your text.</p>";
+            updatePreviews();
+            updateCopyButtonText();
+            
+            // Initialize second tab
+            quill2.root.innerHTML = "<p>Content for AI formatting will appear here.</p><p>Paste plain text and use the Format with AI button to automatically structure it.</p>";
+            updatePreviews2();
+            updateCopyButtonText2();
+            
+            // Connect AI format button event 
+            document.getElementById('aiFormatButton').addEventListener('click', formatWithAI);
+            
+            // Connect AI config button event
+            document.getElementById('aiConfigButton').addEventListener('click', showAIConfig);
+            
+            // Connect clear buttons
+            document.getElementById('clearButton').addEventListener('click', clearEditor);
+            document.getElementById('clearButton2').addEventListener('click', clearEditor2);
+        };
+        
+        // Clear first editor (Content Editor tab)
+        function clearEditor() {
+            // Ask for confirmation before clearing
+            if (confirm('Are you sure you want to clear all content?')) {
+                // Clear Quill editor
+                quill.setText('');
+                
+                // Update previews
+                updatePreviews();
+                
+                // Show status message
+                const statusEl = document.getElementById('importStatus');
+                statusEl.style.display = 'block';
+                statusEl.textContent = 'Content cleared';
+                statusEl.className = 'import-status import-success';
+                
+                // Hide the message after 2 seconds
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 2000);
+            }
+        }
+        
+        // Clear second editor (AI Format tab)
+        function clearEditor2() {
+            // Ask for confirmation before clearing
+            if (confirm('Are you sure you want to clear all content?')) {
+                // Clear Quill editor
+                quill2.setText('');
+                
+                // Update previews
+                updatePreviews2();
+                
+                // Show status message
+                const statusEl = document.getElementById('importStatus2');
+                statusEl.style.display = 'block';
+                statusEl.textContent = 'Content cleared';
+                statusEl.className = 'import-status import-success';
+                
+                // Hide the message after 2 seconds
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 2000);
+            }
+        }
+        
+        // AI formatting function that uses OpenAI API
+        async function formatWithAI() {
+            const aiButton = document.getElementById('aiFormatButton');
+            
+            // Clear any existing errors
+            clearGlobalError();
+            
+            // Show loading state
+            aiButton.classList.add('loading');
+            aiButton.innerHTML = '<span class="ai-loader"></span> Formatting...';
+            
+            // Get settings
+            const apiKey = localStorage.getItem('openai_api_key');
+            const systemPrompt = localStorage.getItem('ai_system_prompt') || document.getElementById('systemPrompt').value;
+            const aiModel = localStorage.getItem('ai_model') || document.getElementById('aiModel').value;
+            const temperature = parseFloat(localStorage.getItem('ai_temperature') || document.getElementById('temperature').value);
+            
+            // Get content to format
+            const content = quill2.root.innerHTML;
+            
+            // Check if API key is available
+            if (!apiKey) {
+                // Show the config modal if no API key
+                showGlobalError('Please configure your OpenAI API key to use AI formatting');
+                showAIConfig();
+                
+                // Reset button state
+                aiButton.classList.remove('loading');
+                aiButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                    <path d="M12 8v8"></path>
+                    <path d="M8 12h8"></path>
+                </svg> Format with AI`;
+                return;
+            }
+            
+            try {
+                // Extract plain text from HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                const plainText = tempDiv.textContent || tempDiv.innerText || '';
+                
+                // Create the prompt for formatting
+                const formattingPrompt = `
+                    Format the following content according to best practices. 
+                    Create organized sections with clear headings, bullet points, and numbered lists as appropriate.
+                    Return the formatted content as HTML that can be directly inserted into a document.
+                    
+                    Original content:
+                    ${plainText}
+                `;
+                
+                // Call the OpenAI API
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: aiModel,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: formattingPrompt }
+                        ],
+                        temperature: temperature,
+                        max_tokens: 2000
+                    })
+                });
+                
+                // Check if response is OK
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || 'Unknown API error');
+                }
+                
+                // Parse the response
+                const data = await response.json();
+                const formattedContent = data.choices[0].message.content;
+                
+                // Update the editor with the formatted content
+                // Check if the response is HTML or plain text
+                if (formattedContent.trim().startsWith('<')) {
+                    // If it's HTML, insert it directly
+                    quill2.clipboard.dangerouslyPasteHTML(formattedContent);
+                } else {
+                    // If it's plain text, wrap in paragraph tags
+                    quill2.clipboard.dangerouslyPasteHTML(`<p>${formattedContent.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`);
+                }
+                
+                // Update the preview
+                updatePreviewsAI();
+                
+                // Show success message
+                const statusEl = document.getElementById('importStatus2');
+                statusEl.style.display = 'block';
+                statusEl.textContent = 'Content formatted successfully with AI!';
+                statusEl.className = 'import-status import-success';
+                
+            } catch (error) {
+                console.error('Error formatting with AI:', error);
+                
+                // Show error message in global error container
+                showGlobalError(`AI Formatting Error: ${error.message}`);
+                
+                // Also show in status for redundancy
+                const statusEl = document.getElementById('importStatus2');
+                statusEl.style.display = 'block';
+                statusEl.textContent = `Error: ${error.message}`;
+                statusEl.className = 'import-status import-error';
+                
+                // Fallback to basic formatting
+                const formattedContent = applyBasicFormatting(content);
+                quill2.root.innerHTML = formattedContent;
+                updatePreviewsAI();
+            } finally {
+                // Reset button state
+                aiButton.classList.remove('loading');
+                aiButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                    <path d="M12 8v8"></path>
+                    <path d="M8 12h8"></path>
+                </svg> Format with AI`;
+            }
+        }
+        
+        // Simple formatting function for the placeholder AI
+        function applyBasicFormatting(content) {
+            // Extract text content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            const text = tempDiv.textContent || tempDiv.innerText || '';
+            
+            // Split into paragraphs
+            const paragraphs = text.split('\n').filter(p => p.trim().length > 0);
+            
+            // Format paragraphs with basic HTML
+            let result = '';
+            
+            if (paragraphs.length === 0) {
+                return '<p>No content to format</p>';
+            }
+            
+            // Add a heading for the first short paragraph
+            result += `<h2>${paragraphs[0].trim()}</h2>`;
+            
+            // Format remaining paragraphs
+            for (let i = 1; i < paragraphs.length; i++) {
+                const para = paragraphs[i].trim();
+                
+                if (para.length < 40 && !para.endsWith('.') && i < paragraphs.length - 1) {
+                    // Short paragraphs without periods are likely subheadings
+                    result += `<h3>${para}</h3>`;
+                } else if (para.startsWith('- ') || para.startsWith('* ')) {
+                    // Convert basic list items to proper HTML lists
+                    const items = para.split(/- |\* /).filter(item => item.trim().length > 0);
+                    result += '<ul>';
+                    items.forEach(item => {
+                        result += `<li>${item.trim()}</li>`;
+                    });
+                    result += '</ul>';
+                } else {
+                    // Regular paragraphs
+                    result += `<p>${para}</p>`;
+                }
+            }
+            
+            return result;
+        }
+        
+        // Replace placeholder with actual AI config function
+        function showAIConfig() {
+            const aiConfigModal = document.getElementById('aiConfigModal');
+            
+            // Load saved settings
+            loadSavedAISettings();
+            
+            // Show the modal
+            aiConfigModal.style.display = 'flex';
+        }
+        
+        // Load saved AI settings from localStorage
+        function loadSavedAISettings() {
+            const systemPrompt = localStorage.getItem('ai_system_prompt');
+            const aiModel = localStorage.getItem('ai_model');
+            const temperature = localStorage.getItem('ai_temperature');
+            
+            // Fill in the form with saved values if they exist
+            if (systemPrompt) {
+                document.getElementById('systemPrompt').value = systemPrompt;
+            }
+            
+            if (aiModel) {
+                document.getElementById('aiModel').value = aiModel;
+            }
+            
+            if (temperature) {
+                document.getElementById('temperature').value = temperature;
+                document.getElementById('tempValue').textContent = temperature;
+            }
+            
+            // Don't load the API key into the form for security (it will be used from localStorage directly)
+            // Just indicate if a key exists
+            if (localStorage.getItem('openai_api_key')) {
+                document.getElementById('apiKey').placeholder = '••••••••••••••••••••••••••••••';
+            }
+        }
+        
+        // AI Config Modal Elements
+        const aiConfigModal = document.getElementById('aiConfigModal');
+        const aiModalClose = document.getElementById('aiModalClose');
+        const aiModalCancel = document.getElementById('aiModalCancel');
+        const aiModalSave = document.getElementById('aiModalSave');
+        const tempSlider = document.getElementById('temperature');
+        const tempValue = document.getElementById('tempValue');
+        
+        // Update temperature value display
+        tempSlider.addEventListener('input', function() {
+            tempValue.textContent = this.value;
+        });
+        
+        // Close AI Config modal when X is clicked
+        aiModalClose.addEventListener('click', closeAIConfigModal);
+        
+        // Close AI Config modal when Cancel is clicked
+        aiModalCancel.addEventListener('click', closeAIConfigModal);
+        
+        // Save AI Config settings
+        aiModalSave.addEventListener('click', function() {
+            // In a real implementation, this would save the settings to be used by the formatWithAI function
+            const systemPrompt = document.getElementById('systemPrompt').value;
+            const aiModel = document.getElementById('aiModel').value;
+            const temperature = tempSlider.value;
+            const apiKey = document.getElementById('apiKey').value;
+            
+            // Save settings to localStorage
+            localStorage.setItem('ai_system_prompt', systemPrompt);
+            localStorage.setItem('ai_model', aiModel);
+            localStorage.setItem('ai_temperature', temperature);
+            
+            // Only save API key if provided (to avoid overwriting existing key)
+            if (apiKey) {
+                localStorage.setItem('openai_api_key', apiKey);
+            }
+            
+            console.log('AI Config saved:', { systemPrompt, aiModel, temperature });
+            closeAIConfigModal();
+        });
+        
+        // Close AI config modal
+        function closeAIConfigModal() {
+            aiConfigModal.style.display = 'none';
+        }
+        
+        // Update previews specifically after AI formatting
+        function updatePreviewsAI() {
+            // Get HTML from the editor
+            var html = quill2.root.innerHTML;
+            
+            // Update Card Preview
+            const cardContentArea = document.getElementById('cardContentArea');
+            cardContentArea.innerHTML = html;
+            
+            // Update format display based on current selection
+            updateFormatDisplay();
+            
+            // Show success message
+            const statusEl = document.getElementById('importStatus2');
+            statusEl.style.display = 'block';
+            statusEl.textContent = 'Content formatted successfully with AI!';
+            statusEl.className = 'import-status import-success';
+        }
+        
+        // Show global error
+        function showGlobalError(errorMessage) {
+            const errorContainer = document.getElementById('globalErrorContainer');
+            const errorMessageEl = document.getElementById('globalErrorMessage');
+            
+            // Set the error message
+            errorMessageEl.textContent = errorMessage;
+            
+            // Show the error container
+            errorContainer.classList.add('visible');
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                errorContainer.classList.remove('visible');
+            }, 10000);
+        }
+        
+        // Clear global error
+        function clearGlobalError() {
+            const errorContainer = document.getElementById('globalErrorContainer');
+            errorContainer.classList.remove('visible');
+        }
+    </script>
+</body>
+</html>
