@@ -1813,24 +1813,39 @@
         
         function copyCurrentFormat() {
             var textToCopy = document.getElementById('inputText').value;
+            console.log("Attempting to copy for Tab 1..."); // DEBUG
             navigator.clipboard.writeText(textToCopy).then(() => {
+                console.log("Clipboard write successful for Tab 1."); // DEBUG
                 showCopySuccess();
+            }).catch(err => {
+                console.error("Failed to copy for Tab 1: ", err); // DEBUG: Catch errors
             });
         }
         
         function copyCurrentFormat2() {
             var textToCopy = document.getElementById('inputText2').value;
+            console.log("Attempting to copy for Tab 2..."); // DEBUG
             navigator.clipboard.writeText(textToCopy).then(() => {
+                console.log("Clipboard write successful for Tab 2."); // DEBUG
                 showCopySuccess();
+            }).catch(err => {
+                console.error("Failed to copy for Tab 2: ", err); // DEBUG: Catch errors
             });
         }
         
         function showCopySuccess() {
+            console.log("showCopySuccess called."); // DEBUG
             const copySuccess = document.getElementById('copySuccess');
-            copySuccess.style.display = 'block';
-            setTimeout(() => {
-                copySuccess.style.display = 'none';
-            }, 2000);
+            if (copySuccess) {
+                console.log("Found copySuccess element. Setting display to block."); // DEBUG
+                copySuccess.style.display = 'block';
+                setTimeout(() => {
+                    console.log("Hiding copySuccess element."); // DEBUG
+                    copySuccess.style.display = 'none';
+                }, 2000);
+            } else {
+                console.error("Could not find copySuccess element!"); // DEBUG
+            }
         }
         
         // Card style selector for first tab
