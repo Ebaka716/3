@@ -1,0 +1,1 @@
+{"name":"content-format-preview","version":"1.0.0","description":"Content format preview tool","main":"index.html","scripts":{"start":"serve ."},"dependencies":{"serve":"^14.0.0"}}
