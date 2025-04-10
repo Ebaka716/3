@@ -1010,6 +1010,22 @@
             max-width: 100%;
             flex-grow: 1; /* Added */
             min-height: 0; /* Added */
+            height: calc(100vh - 120px); /* Take full viewport height minus header */
+            display: flex; /* Changed from grid to flex */
+            flex-direction: row; /* Side by side boxes */
+            justify-content: space-between;
+        }
+        
+        /* Update grid layout to flex for better height handling */
+        #tab-one .container {
+            display: flex; /* Change from grid to flex */
+            flex-direction: row; /* Side by side boxes */
+            justify-content: space-between;
+        }
+        
+        #tab-one .text-box {
+            flex: 1; /* Equal width boxes */
+            max-width: calc(50% - 10px); /* Account for gap */
         }
         
         #tab-one #editor-container {
