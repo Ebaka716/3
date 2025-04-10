@@ -3846,80 +3846,91 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">AI Configuration</h3>
-                <button class="modal-close" id="aiModalClose">&times;</button>
-            </div>
-            <!-- Provider selection dropdown moved above the tabs -->
-            <div style="padding: 16px 16px 10px 16px;">
-                <label for="aiProvider" style="display: block; margin-bottom: 6px; font-weight: 500;">Default Provider</label>
-                <select id="aiProvider" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-                    <option value="openai" selected>OpenAI</option>
-                    <option value="claude">Claude (Anthropic)</option>
-                </select>
-            </div>
-            <!-- Added Provider Tabs -->
-            <div class="modal-tabs">
-                <button class="modal-tab active" data-tab="openai-panel">OpenAI</button>
-                <button class="modal-tab" data-tab="claude-panel">Claude</button>
-            </div>
-            <!-- OpenAI Panel -->
-            <div id="openai-panel" class="tab-panel active" style="padding: 16px;">
-                <div style="margin-bottom: 16px;">
-                    <label for="systemPrompt" style="display: block; margin-bottom: 6px; font-weight: 500;">System Prompt</label>
-                    <textarea id="systemPrompt" rows="5" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" placeholder="Enter instructions for the AI on how to format content...">You are a helpful assistant that formats text into clear, structured content. Create organized sections with headings, bullet points, and numbered lists as appropriate.</textarea>
+                <!-- New View Selector Buttons -->
+                <div class="modal-view-selector" style="margin-left: 20px;">
+                    <button class="modal-view-tab active" data-view="system-settings-view">System Settings</button>
+                    <button class="modal-view-tab" data-view="model-settings-view">Model Settings</button>
                 </div>
+                <button class="modal-close" id="aiModalClose" style="margin-left: auto;">&times;</button>
+            </div>
+
+            <!-- System Settings View -->
+            <div id="system-settings-view" class="modal-view active" style="padding: 16px;">
                 <div style="margin-bottom: 16px;">
-                    <label for="aiModel" style="display: block; margin-bottom: 6px; font-weight: 500;">AI Model</label>
-                    <select id="aiModel" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-                        <option value="gpt-4">GPT-4 (High quality, more expensive)</option>
-                        <option value="gpt-3.5-turbo" selected>GPT-3.5 Turbo (Faster, less expensive)</option>
+                    <label for="aiProvider" style="display: block; margin-bottom: 6px; font-weight: 500;">Default Provider</label>
+                    <select id="aiProvider" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                        <option value="openai" selected>OpenAI</option>
+                        <option value="claude">Claude (Anthropic)</option>
                     </select>
                 </div>
                 <div style="margin-bottom: 16px;">
-                    <label for="temperature" style="display: block; margin-bottom: 6px; font-weight: 500;">Temperature: <span id="tempValue">0.7</span></label>
-                    <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7" style="width: 100%;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
-                        <span>More focused</span>
-                        <span>More creative</span>
+                    <label for="systemPrompt" style="display: block; margin-bottom: 6px; font-weight: 500;">System Prompt (Shared)</label>
+                    <textarea id="systemPrompt" rows="8" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" placeholder="Enter shared instructions for the AI on how to format content...">You are a helpful assistant that formats text into clear, structured content. Create organized sections with headings, bullet points, and numbered lists as appropriate.</textarea>
+                </div>
+            </div>
+
+            <!-- Model Settings View -->
+            <div id="model-settings-view" class="modal-view" style="padding: 16px; display: none;">
+                <!-- Provider Tabs (within Model Settings) -->
+                <div class="modal-tabs">
+                    <button class="modal-tab active" data-tab="openai-panel">OpenAI</button>
+                    <button class="modal-tab" data-tab="claude-panel">Claude</button>
+                </div>
+                <!-- OpenAI Panel -->
+                <div id="openai-panel" class="tab-panel active" style="padding-top: 16px;">
+                    <!-- System Prompt removed from here -->
+                    <div style="margin-bottom: 16px;">
+                        <label for="aiModel" style="display: block; margin-bottom: 6px; font-weight: 500;">AI Model</label>
+                        <select id="aiModel" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                            <option value="gpt-4">GPT-4 (High quality, more expensive)</option>
+                            <option value="gpt-3.5-turbo" selected>GPT-3.5 Turbo (Faster, less expensive)</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label for="temperature" style="display: block; margin-bottom: 6px; font-weight: 500;">Temperature: <span id="tempValue">0.7</span></label>
+                        <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7" style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
+                            <span>More focused</span>
+                            <span>More creative</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label for="apiKey" style="display: block; margin-bottom: 6px; font-weight: 500;">OpenAI API Key</label>
+                        <input type="password" id="apiKey" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" placeholder="sk-...">
+                        <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                            Your API key is stored locally in your browser and never sent to our servers.
+                        </div>
                     </div>
                 </div>
-                <div style="margin-bottom: 16px;">
-                    <label for="apiKey" style="display: block; margin-bottom: 6px; font-weight: 500;">OpenAI API Key</label>
-                    <input type="password" id="apiKey" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" placeholder="sk-...">
-                    <div style="font-size: 12px; color: #666; margin-top: 4px;">
-                        Your API key is stored locally in your browser and never sent to our servers.
+                <!-- Claude Panel (New) -->
+                <div id="claude-panel" class="tab-panel" style="padding-top: 16px; display: none;">
+                    <!-- System Prompt removed from here -->
+                    <div style="margin-bottom: 16px;">
+                        <label for="claudeModel" style="display: block; margin-bottom: 6px; font-weight: 500;">Claude Model</label>
+                        <select id="claudeModel" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                            <option value="claude-3-opus-20240229">Claude 3 Opus (High quality)</option>
+                            <option value="claude-3-sonnet-20240229" selected>Claude 3 Sonnet (Balanced)</option>
+                            <option value="claude-3-haiku-20240307">Claude 3 Haiku (Faster)</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label for="claudeTemperature" style="display: block; margin-bottom: 6px; font-weight: 500;">Temperature: <span id="claudeTempValue">0.7</span></label>
+                        <input type="range" id="claudeTemperature" min="0" max="1" step="0.1" value="0.7" style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
+                            <span>More focused</span>
+                            <span>More creative</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label for="claudeApiKey" style="display: block; margin-bottom: 6px; font-weight: 500;">Claude API Key</label>
+                        <input type="password" id="claudeApiKey" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" placeholder="sk-ant-...">
+                        <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                            Your API key is stored locally in your browser and never sent to our servers.
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Claude Panel (New) -->
-            <div id="claude-panel" class="tab-panel" style="padding: 16px; display: none;">
-                <div style="margin-bottom: 16px;">
-                    <label for="claudeSystemPrompt" style="display: block; margin-bottom: 6px; font-weight: 500;">System Prompt</label>
-                    <textarea id="claudeSystemPrompt" rows="5" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" placeholder="Enter instructions for Claude on how to format content...">You are a helpful assistant that formats text into clear, structured content. Create organized sections with headings, bullet points, and numbered lists as appropriate.</textarea>
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label for="claudeModel" style="display: block; margin-bottom: 6px; font-weight: 500;">Claude Model</label>
-                    <select id="claudeModel" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-                        <option value="claude-3-opus-20240229">Claude 3 Opus (High quality)</option>
-                        <option value="claude-3-sonnet-20240229" selected>Claude 3 Sonnet (Balanced)</option>
-                        <option value="claude-3-haiku-20240307">Claude 3 Haiku (Faster)</option>
-                    </select>
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label for="claudeTemperature" style="display: block; margin-bottom: 6px; font-weight: 500;">Temperature: <span id="claudeTempValue">0.7</span></label>
-                    <input type="range" id="claudeTemperature" min="0" max="1" step="0.1" value="0.7" style="width: 100%;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
-                        <span>More focused</span>
-                        <span>More creative</span>
-                    </div>
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label for="claudeApiKey" style="display: block; margin-bottom: 6px; font-weight: 500;">Claude API Key</label>
-                    <input type="password" id="claudeApiKey" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" placeholder="sk-ant-...">
-                    <div style="font-size: 12px; color: #666; margin-top: 4px;">
-                        Your API key is stored locally in your browser and never sent to our servers.
-                    </div>
-                </div>
-            </div>
+            <!-- Modal Actions -->
             <div class="modal-actions">
                 <button class="modal-button modal-button-cancel" id="aiModalCancel">Cancel</button>
                 <button class="modal-button modal-button-proceed" id="aiModalSave">Save Changes</button>
@@ -4706,6 +4717,7 @@
         async function formatWithOpenAI(prompt) {
             // Get OpenAI settings
             const apiKey = localStorage.getItem('openai_api_key');
+            // Use the shared system prompt setting
             const systemPrompt = localStorage.getItem('ai_system_prompt') || document.getElementById('systemPrompt').value;
             const aiModel = localStorage.getItem('ai_model') || document.getElementById('aiModel').value;
             const temperature = parseFloat(localStorage.getItem('ai_temperature') || document.getElementById('temperature').value);
@@ -4751,7 +4763,8 @@
         async function formatWithClaude(prompt) {
             // Get Claude settings
             const apiKey = localStorage.getItem('claude_api_key');
-            const systemPrompt = localStorage.getItem('claude_system_prompt') || document.getElementById('claudeSystemPrompt').value;
+            // Use the shared system prompt setting
+            const systemPrompt = localStorage.getItem('ai_system_prompt') || document.getElementById('systemPrompt').value;
             const claudeModel = localStorage.getItem('claude_model') || document.getElementById('claudeModel').value;
             const temperature = parseFloat(localStorage.getItem('claude_temperature') || document.getElementById('claudeTemperature').value);
             
@@ -4871,6 +4884,8 @@
             
             // Show the modal
             aiConfigModal.style.display = 'flex';
+            // Default to system settings view
+            switchView('system-settings-view');
         }
         
         // Load saved AI settings from localStorage
@@ -4878,14 +4893,17 @@
             // General provider setting
             const aiProvider = localStorage.getItem('ai_provider');
             
-            // OpenAI settings
+            // Shared System Prompt
             const systemPrompt = localStorage.getItem('ai_system_prompt');
+            
+            // OpenAI settings
+            // const systemPrompt = localStorage.getItem('ai_system_prompt'); // Removed, using shared one
             const aiModel = localStorage.getItem('ai_model');
             const temperature = localStorage.getItem('ai_temperature');
             const apiKey = localStorage.getItem('openai_api_key');
             
             // Claude settings
-            const claudeSystemPrompt = localStorage.getItem('claude_system_prompt');
+            // const claudeSystemPrompt = localStorage.getItem('claude_system_prompt'); // Removed, using shared one
             const claudeModel = localStorage.getItem('claude_model');
             const claudeTemperature = localStorage.getItem('claude_temperature');
             const claudeApiKey = localStorage.getItem('claude_api_key');
@@ -4893,15 +4911,16 @@
             // Set provider dropdown if available
             if (aiProvider) {
                 document.getElementById('aiProvider').value = aiProvider;
-                // Switch to the appropriate tab
-                switchTab(aiProvider === 'claude' ? 'claude-panel' : 'openai-panel');
+                // Switch to the appropriate provider tab when Model Settings is viewed (handled by switchView)
+                // switchTab(aiProvider === 'claude' ? 'claude-panel' : 'openai-panel'); // Moved logic to switchView
             }
             
-            // OpenAI settings
+            // Set Shared System Prompt
             if (systemPrompt) {
                 document.getElementById('systemPrompt').value = systemPrompt;
             }
             
+            // OpenAI settings (excluding system prompt)
             if (aiModel) {
                 document.getElementById('aiModel').value = aiModel;
             }
@@ -4915,10 +4934,10 @@
                 document.getElementById('apiKey').value = apiKey;
             }
             
-            // Claude settings
-            if (claudeSystemPrompt) {
-                document.getElementById('claudeSystemPrompt').value = claudeSystemPrompt;
-            }
+            // Claude settings (excluding system prompt)
+            // if (claudeSystemPrompt) { // Removed
+            //     document.getElementById('claudeSystemPrompt').value = claudeSystemPrompt; // Removed
+            // } // Removed
             
             if (claudeModel) {
                 document.getElementById('claudeModel').value = claudeModel;
@@ -4945,13 +4964,17 @@
             const aiProvider = document.getElementById('aiProvider').value;
             localStorage.setItem('ai_provider', aiProvider);
             
-            // Save OpenAI settings
+            // Get and Save Shared System Prompt
             const systemPrompt = document.getElementById('systemPrompt').value;
+            localStorage.setItem('ai_system_prompt', systemPrompt);
+            
+            // Save OpenAI settings (excluding system prompt)
+            // const systemPrompt = document.getElementById('systemPrompt').value; // Removed, saved above
             const aiModel = document.getElementById('aiModel').value;
             const temperature = document.getElementById('temperature').value;
             const apiKey = document.getElementById('apiKey').value;
             
-            localStorage.setItem('ai_system_prompt', systemPrompt);
+            // localStorage.setItem('ai_system_prompt', systemPrompt); // Removed, saved above
             localStorage.setItem('ai_model', aiModel);
             localStorage.setItem('ai_temperature', temperature);
             
@@ -4959,13 +4982,13 @@
                 localStorage.setItem('openai_api_key', apiKey);
             }
             
-            // Save Claude settings
-            const claudeSystemPrompt = document.getElementById('claudeSystemPrompt').value;
+            // Save Claude settings (excluding system prompt)
+            // const claudeSystemPrompt = document.getElementById('claudeSystemPrompt').value; // Removed
             const claudeModel = document.getElementById('claudeModel').value;
             const claudeTemperature = document.getElementById('claudeTemperature').value;
             const claudeApiKey = document.getElementById('claudeApiKey').value;
             
-            localStorage.setItem('claude_system_prompt', claudeSystemPrompt);
+            // localStorage.setItem('claude_system_prompt', claudeSystemPrompt); // Removed
             localStorage.setItem('claude_model', claudeModel);
             localStorage.setItem('claude_temperature', claudeTemperature);
             
@@ -4982,14 +5005,22 @@
         
         // Initialize tab functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Tab switching for AI Config modal
-            document.querySelectorAll('.modal-tab').forEach(tab => {
+            // Tab switching for AI Config modal (Provider Tabs)
+            document.querySelectorAll('#model-settings-view .modal-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     const tabId = this.getAttribute('data-tab');
                     switchTab(tabId);
                 });
             });
-            
+
+            // View switching for AI Config modal (System vs Model Settings)
+            document.querySelectorAll('.modal-view-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const viewId = this.getAttribute('data-view');
+                    switchView(viewId);
+                });
+            });
+
             // Temperature sliders
             const tempSlider = document.getElementById('temperature');
             const tempValue = document.getElementById('tempValue');
@@ -5250,6 +5281,34 @@
             console.error("Could not find Tab 1 screenshot button or element to capture.");
         }
         // === End Screenshot Logic ===
+
+        // Function to switch main views in the modal (System vs Model Settings)
+        function switchView(viewId) {
+            // Update view selector buttons
+            document.querySelectorAll('.modal-view-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-view') === viewId) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Update view content panels
+            document.querySelectorAll('.modal-view').forEach(view => {
+                view.classList.remove('active');
+                view.style.display = 'none';
+            });
+
+            const activeView = document.getElementById(viewId);
+            if (activeView) {
+                activeView.classList.add('active');
+                activeView.style.display = 'block';
+                // If switching to model settings, ensure the correct provider tab is shown based on default provider
+                if (viewId === 'model-settings-view') {
+                     const defaultProvider = document.getElementById('aiProvider').value || 'openai';
+                     switchTab(defaultProvider === 'claude' ? 'claude-panel' : 'openai-panel');
+                }
+            }
+        }
 
     </script>
 </body>
