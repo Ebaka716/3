@@ -2145,30 +2145,52 @@
             reader.readAsArrayBuffer(file);
         }
         
-        function updatePreviews() {
-            // Get HTML from Quill
-            var html = quill.root.innerHTML;
+        /**
+         * Shared function to update previews with configuration options
+         * @param {Object} config - Configuration object
+         * @param {Object} config.source - Source Quill editor
+         * @param {string} config.cardAreaId - ID of card content area to update
+         * @param {string} config.rawContentId - ID of the raw content textarea
+         * @param {Function} config.formatDisplayFn - Function to call for updating format display
+         */
+        function updatePreviewsWithConfig(config) {
+            // Get HTML from the source editor
+            const html = config.source.root.innerHTML;
             
-            // Update Card Preview
-            const cardContentArea = document.getElementById('cardContentArea1');
-            cardContentArea.innerHTML = html;
+            // Update Card Preview if element exists and ID is provided
+            if (config.cardAreaId) {
+                const cardContentArea = document.getElementById(config.cardAreaId);
+                if (cardContentArea) cardContentArea.innerHTML = html;
+            }
             
             // Update format display based on current selection
-            updateFormatDisplay();
+            if (config.formatDisplayFn) config.formatDisplayFn();
             
-            // Store raw content
-            document.getElementById('rawContent').value = html;
+            // Store raw content if element exists and ID is provided
+            if (config.rawContentId) {
+                const rawContent = document.getElementById(config.rawContentId);
+                if (rawContent) rawContent.value = html;
+            }
         }
-        
+
+        function updatePreviews() {
+            // Use the shared function with tab one configuration
+            updatePreviewsWithConfig({
+                source: quill,
+                cardAreaId: 'cardContentArea1',
+                rawContentId: 'rawContent',
+                formatDisplayFn: updateFormatDisplay
+            });
+        }
+
         function updatePreviews2() {
-            // Get HTML from second Quill
-            var html = quill2.root.innerHTML;
-            
-            // Update format display based on current selection
-            updateFormatDisplay2();
-            
-            // Store raw content
-            document.getElementById('rawContent2').value = html;
+            // Use the shared function with tab two configuration
+            updatePreviewsWithConfig({
+                source: quill2,
+                cardAreaId: 'cardContentArea2', // Note: This may not exist yet, handled by updatePreviewsAI
+                rawContentId: 'rawContent2',
+                formatDisplayFn: updateFormatDisplay2
+            });
         }
         
         function toggleFormat(format) {
@@ -2767,30 +2789,24 @@
         // Update previews specifically after AI formatting
         function updatePreviewsAI() {
             // Get HTML from the editor
-            var html = quill2.root.innerHTML;
+            const html = quill2.root.innerHTML;
             
-            // Create a second card content area if it doesn't exist yet
+            // Create or update a card content area specifically for AI
             let cardContentArea2 = document.getElementById('cardContentArea2');
             if (!cardContentArea2) {
                 // Create it if it doesn't exist in the DOM yet
                 cardContentArea2 = document.createElement('div');
                 cardContentArea2.id = 'cardContentArea2';
-                
-                // Find the modal preview area and set it up
-                const modalCardContentArea = document.getElementById('modalCardContentArea');
-                if (modalCardContentArea) {
-                    modalCardContentArea.parentElement.classList.add('with-intent');
-                    modalCardContentArea.innerHTML = html;
-                }
-            } else {
-                // Update the AI preview area
-                cardContentArea2.innerHTML = html;
-                
-                // Also update the modal preview if visible
-                const modalCardContentArea = document.getElementById('modalCardContentArea');
-                if (modalCardContentArea) {
-                    modalCardContentArea.innerHTML = html;
-                }
+            }
+            
+            // Update the AI preview area
+            cardContentArea2.innerHTML = html;
+            
+            // Also update the modal preview if visible
+            const modalCardContentArea = document.getElementById('modalCardContentArea');
+            if (modalCardContentArea) {
+                modalCardContentArea.parentElement.classList.add('with-intent');
+                modalCardContentArea.innerHTML = html;
             }
             
             // Update format display based on current selection
