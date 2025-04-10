@@ -1911,53 +1911,16 @@
             importModal.style.display = 'none';
         }
         
-        // Handle file input change for first tab
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const statusEl = document.getElementById('importStatus');
-            statusEl.style.display = 'block';
-            statusEl.textContent = 'Importing file...';
-            statusEl.className = 'import-status';
-            
-            const fileExt = file.name.split('.').pop().toLowerCase();
-            
-            // Check if file type matches selected import mode
-            if ((fileExt === 'xlsx' || fileExt === 'xls') && importMode.startsWith('excel')) {
-                processExcelFile(file);
-            } else if ((fileExt === 'doc' || fileExt === 'docx') && importMode === 'word') {
-                processWordFile(file);
-            } else {
-                statusEl.textContent = 'Error: File type does not match selected import mode';
-                statusEl.classList.add('import-error');
-            }
-        });
-        
-        // Handle file input change for second tab
-        document.getElementById('fileInput2').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const statusEl = document.getElementById('importStatus2');
-            statusEl.style.display = 'block';
-            statusEl.textContent = 'Importing file...';
-            statusEl.className = 'import-status';
-            
-            const fileExt = file.name.split('.').pop().toLowerCase();
-            
-            // Check if file type matches selected import mode
-            if ((fileExt === 'xlsx' || fileExt === 'xls') && importMode.startsWith('excel')) {
-                processExcelFile2(file);
-            } else if ((fileExt === 'doc' || fileExt === 'docx') && importMode === 'word') {
-                processWordFile2(file);
-            } else {
-                statusEl.textContent = 'Error: File type does not match selected import mode';
-                statusEl.className = 'import-status import-error';
-            }
-        });
-        
-        function processExcelFile(file) {
+        /**
+         * Shared function to process Excel files with configuration options
+         * @param {Object} config - Configuration object
+         * @param {File} config.file - The Excel file to process
+         * @param {Object} config.quillEditor - The Quill editor to insert content into
+         * @param {string} config.statusElId - ID of the status element
+         * @param {string} config.fileInputId - ID of the file input element
+         * @param {Function} config.updatePreviewsFn - Function to update previews
+         */
+        function processExcelFileWithConfig(config) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -1979,112 +1942,96 @@
                     }
                     
                     // Insert into Quill editor
-                    quill.clipboard.dangerouslyPasteHTML(content);
+                    config.quillEditor.clipboard.dangerouslyPasteHTML(content);
                     
                     // Show success message
-                    const statusEl = document.getElementById('importStatus');
-                    statusEl.textContent = 'File imported successfully!';
-                    statusEl.className = 'import-status import-success';
-                    
-                    // Clear file input
-                    document.getElementById('fileInput').value = '';
-                    
-                    // Update previews
-                    updatePreviews();
-                } catch (error) {
-                    console.error('Error parsing Excel file:', error);
-                    const statusEl = document.getElementById('importStatus');
-                    statusEl.textContent = 'Error importing Excel file: ' + error.message;
-                    statusEl.className = 'import-status import-error';
-                    
-                    // Show global error message
-                    showGlobalError('Error importing Excel file: ' + error.message);
-                }
-            };
-            reader.onerror = function() {
-                const statusEl = document.getElementById('importStatus');
-                statusEl.textContent = 'Error reading file';
-                statusEl.className = 'import-status import-error';
-                
-                // Show global error message
-                showGlobalError('Error reading file');
-            };
-            reader.readAsArrayBuffer(file);
-        }
-        
-        function processExcelFile2(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    
-                    // Get first worksheet
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    
-                    let content = '';
-                    if (importMode === 'excel-cell') {
-                        // Get cell A1 content or first non-empty cell
-                        const cellAddress = 'A1'; // Default cell
-                        const cell = firstSheet[cellAddress];
-                        content = cell ? cell.v : '';
-                    } else {
-                        // Convert to HTML table
-                        content = XLSX.utils.sheet_to_html(firstSheet);
+                    const statusEl = document.getElementById(config.statusElId);
+                    if (statusEl) {
+                        statusEl.textContent = 'File imported successfully!';
+                        statusEl.className = 'import-status import-success';
                     }
                     
-                    // Insert into second Quill editor
-                    quill2.clipboard.dangerouslyPasteHTML(content);
-                    
-                    // Show success message
-                    const statusEl = document.getElementById('importStatus2');
-                    statusEl.textContent = 'File imported successfully!';
-                    statusEl.className = 'import-status import-success';
-                    
                     // Clear file input
-                    document.getElementById('fileInput2').value = '';
+                    const fileInput = document.getElementById(config.fileInputId);
+                    if (fileInput) fileInput.value = '';
                     
                     // Update previews
-                    updatePreviews2();
+                    if (config.updatePreviewsFn) config.updatePreviewsFn();
                 } catch (error) {
                     console.error('Error parsing Excel file:', error);
-                    const statusEl = document.getElementById('importStatus2');
-                    statusEl.textContent = 'Error importing Excel file: ' + error.message;
-                    statusEl.className = 'import-status import-error';
+                    const statusEl = document.getElementById(config.statusElId);
+                    if (statusEl) {
+                        statusEl.textContent = 'Error importing Excel file: ' + error.message;
+                        statusEl.className = 'import-status import-error';
+                    }
                     
                     // Show global error message
                     showGlobalError('Error importing Excel file: ' + error.message);
                 }
             };
             reader.onerror = function() {
-                const statusEl = document.getElementById('importStatus2');
-                statusEl.textContent = 'Error reading file';
-                statusEl.className = 'import-status import-error';
+                const statusEl = document.getElementById(config.statusElId);
+                if (statusEl) {
+                    statusEl.textContent = 'Error reading file';
+                    statusEl.className = 'import-status import-error';
+                }
                 
                 // Show global error message
                 showGlobalError('Error reading file');
             };
-            reader.readAsArrayBuffer(file);
+            reader.readAsArrayBuffer(config.file);
+        }
+
+        function processExcelFile(file) {
+            processExcelFileWithConfig({
+                file: file,
+                quillEditor: quill,
+                statusElId: 'importStatus',
+                fileInputId: 'fileInput',
+                updatePreviewsFn: updatePreviews
+            });
+        }
+
+        function processExcelFile2(file) {
+            processExcelFileWithConfig({
+                file: file,
+                quillEditor: quill2,
+                statusElId: 'importStatus2',
+                fileInputId: 'fileInput2',
+                updatePreviewsFn: updatePreviews2
+            });
         }
         
-        function processWordFile(file) {
+        /**
+         * Shared function to process Word files with configuration options
+         * @param {Object} config - Configuration object
+         * @param {File} config.file - The Word file to process
+         * @param {Object} config.quillEditor - The Quill editor to insert content into
+         * @param {string} config.statusElId - ID of the status element
+         * @param {string} config.fileInputId - ID of the file input element
+         * @param {Function} config.updatePreviewsFn - Function to update previews
+         */
+        function processWordFileWithConfig(config) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 mammoth.convertToHtml({ arrayBuffer: e.target.result })
                     .then(function(result) {
                         // Insert into Quill editor
-                        quill.clipboard.dangerouslyPasteHTML(result.value);
+                        config.quillEditor.clipboard.dangerouslyPasteHTML(result.value);
                         
                         // Show success message
-                        const statusEl = document.getElementById('importStatus');
-                        statusEl.textContent = 'Word document imported successfully!';
-                        statusEl.className = 'import-status import-success';
+                        const statusEl = document.getElementById(config.statusElId);
+                        if (statusEl) {
+                            statusEl.textContent = 'Word document imported successfully!';
+                            statusEl.className = 'import-status import-success';
+                        }
                         
                         // Clear file input
-                        document.getElementById('fileInput').value = '';
+                        const fileInput = document.getElementById(config.fileInputId);
+                        if (fileInput) fileInput.value = '';
                         
                         // Update previews
-                        updatePreviews();
+                        if (config.updatePreviewsFn) config.updatePreviewsFn();
                         
                         // Log any warnings
                         if (result.messages.length > 0) {
@@ -2093,56 +2040,41 @@
                     })
                     .catch(function(error) {
                         console.error('Error parsing Word file:', error);
-                        const statusEl = document.getElementById('importStatus');
-                        statusEl.textContent = 'Error importing Word file: ' + error.message;
-                        statusEl.className = 'import-status import-error';
+                        const statusEl = document.getElementById(config.statusElId);
+                        if (statusEl) {
+                            statusEl.textContent = 'Error importing Word file: ' + error.message;
+                            statusEl.className = 'import-status import-error';
+                        }
                     });
             };
             reader.onerror = function() {
-                const statusEl = document.getElementById('importStatus');
-                statusEl.textContent = 'Error reading file';
-                statusEl.className = 'import-status import-error';
+                const statusEl = document.getElementById(config.statusElId);
+                if (statusEl) {
+                    statusEl.textContent = 'Error reading file';
+                    statusEl.className = 'import-status import-error';
+                }
             };
-            reader.readAsArrayBuffer(file);
+            reader.readAsArrayBuffer(config.file);
         }
-        
+
+        function processWordFile(file) {
+            processWordFileWithConfig({
+                file: file,
+                quillEditor: quill,
+                statusElId: 'importStatus',
+                fileInputId: 'fileInput',
+                updatePreviewsFn: updatePreviews
+            });
+        }
+
         function processWordFile2(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                mammoth.convertToHtml({ arrayBuffer: e.target.result })
-                    .then(function(result) {
-                        // Insert into second Quill editor
-                        quill2.clipboard.dangerouslyPasteHTML(result.value);
-                        
-                        // Show success message
-                        const statusEl = document.getElementById('importStatus2');
-                        statusEl.textContent = 'Word document imported successfully!';
-                        statusEl.className = 'import-status import-success';
-                        
-                        // Clear file input
-                        document.getElementById('fileInput2').value = '';
-                        
-                        // Update previews
-                        updatePreviews2();
-                        
-                        // Log any warnings
-                        if (result.messages.length > 0) {
-                            console.warn('Warnings during Word import:', result.messages);
-                        }
-                    })
-                    .catch(function(error) {
-                        console.error('Error parsing Word file:', error);
-                        const statusEl = document.getElementById('importStatus2');
-                        statusEl.textContent = 'Error importing Word file: ' + error.message;
-                        statusEl.className = 'import-status import-error';
-                    });
-            };
-            reader.onerror = function() {
-                const statusEl = document.getElementById('importStatus2');
-                statusEl.textContent = 'Error reading file';
-                statusEl.className = 'import-status import-error';
-            };
-            reader.readAsArrayBuffer(file);
+            processWordFileWithConfig({
+                file: file,
+                quillEditor: quill2,
+                statusElId: 'importStatus2',
+                fileInputId: 'fileInput2',
+                updatePreviewsFn: updatePreviews2
+            });
         }
         
         /**
@@ -2193,34 +2125,55 @@
             });
         }
         
-        function toggleFormat(format) {
+        /**
+         * Shared function to toggle between HTML and Markdown formats
+         * @param {Object} config - Configuration object
+         * @param {string} config.format - Format to set ('html' or 'markdown')
+         * @param {string} config.htmlToggleId - ID of the HTML toggle button
+         * @param {string} config.markdownToggleId - ID of the Markdown toggle button
+         * @param {Function} config.formatDisplayFn - Function to update the display
+         * @param {Function} config.copyButtonTextFn - Function to update copy button text
+         * @param {Object} config.formatRef - Reference to the format variable to update
+         */
+        function toggleFormatWithConfig(config) {
             // Update toggle buttons
-            document.getElementById('htmlToggle').classList.toggle('active', format === 'html');
-            document.getElementById('markdownToggle').classList.toggle('active', format === 'markdown');
+            document.getElementById(config.htmlToggleId).classList.toggle('active', config.format === 'html');
+            document.getElementById(config.markdownToggleId).classList.toggle('active', config.format === 'markdown');
             
-            // Save current format
-            currentFormat = format;
+            // Save current format by reference
+            config.formatRef.current = config.format;
             
             // Update the display
-            updateFormatDisplay();
+            if (config.formatDisplayFn) config.formatDisplayFn();
             
             // Update copy button text
-            updateCopyButtonText();
+            if (config.copyButtonTextFn) config.copyButtonTextFn();
         }
-        
+
+        function toggleFormat(format) {
+            toggleFormatWithConfig({
+                format: format,
+                htmlToggleId: 'htmlToggle',
+                markdownToggleId: 'markdownToggle',
+                formatDisplayFn: updateFormatDisplay,
+                copyButtonTextFn: updateCopyButtonText,
+                formatRef: { current: currentFormat }
+            });
+            // Update the global variable
+            currentFormat = format;
+        }
+
         function toggleFormat2(format) {
-            // Update toggle buttons
-            document.getElementById('htmlToggle2').classList.toggle('active', format === 'html');
-            document.getElementById('markdownToggle2').classList.toggle('active', format === 'markdown');
-            
-            // Save current format
+            toggleFormatWithConfig({
+                format: format,
+                htmlToggleId: 'htmlToggle2',
+                markdownToggleId: 'markdownToggle2',
+                formatDisplayFn: updateFormatDisplay2,
+                copyButtonTextFn: updateCopyButtonText2,
+                formatRef: { current: currentFormat2 }
+            });
+            // Update the global variable
             currentFormat2 = format;
-            
-            // Update the display
-            updateFormatDisplay2();
-            
-            // Update copy button text
-            updateCopyButtonText2();
         }
         
         /**
@@ -2260,22 +2213,35 @@
             });
         }
 
-        function updateCopyButtonText() {
-            var copyButton = document.getElementById('copyButton');
-            if (currentFormat === 'html') {
+        /**
+         * Shared function to update the copy button text based on the current format
+         * @param {Object} config - Configuration object
+         * @param {string} config.copyButtonId - ID of the copy button
+         * @param {string} config.currentFormat - Current format ('html' or 'markdown')
+         */
+        function updateCopyButtonTextWithConfig(config) {
+            const copyButton = document.getElementById(config.copyButtonId);
+            if (!copyButton) return;
+            
+            if (config.currentFormat === 'html') {
                 copyButton.textContent = 'Copy HTML to Clipboard';
             } else {
                 copyButton.textContent = 'Copy Markdown to Clipboard';
             }
         }
-        
+
+        function updateCopyButtonText() {
+            updateCopyButtonTextWithConfig({
+                copyButtonId: 'copyButton',
+                currentFormat: currentFormat
+            });
+        }
+
         function updateCopyButtonText2() {
-            var copyButton = document.getElementById('copyButton2');
-            if (currentFormat2 === 'html') {
-                copyButton.textContent = 'Copy HTML to Clipboard';
-            } else {
-                copyButton.textContent = 'Copy Markdown to Clipboard';
-            }
+            updateCopyButtonTextWithConfig({
+                copyButtonId: 'copyButton2',
+                currentFormat: currentFormat2
+            });
         }
         
         /**
@@ -3087,6 +3053,52 @@
                 }
             }
         }
+
+        // Handle file input change for first tab
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const statusEl = document.getElementById('importStatus');
+            statusEl.style.display = 'block';
+            statusEl.textContent = 'Importing file...';
+            statusEl.className = 'import-status';
+            
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            
+            // Check if file type matches selected import mode
+            if ((fileExt === 'xlsx' || fileExt === 'xls') && importMode.startsWith('excel')) {
+                processExcelFile(file);
+            } else if ((fileExt === 'doc' || fileExt === 'docx') && importMode === 'word') {
+                processWordFile(file);
+            } else {
+                statusEl.textContent = 'Error: File type does not match selected import mode';
+                statusEl.className = 'import-status import-error';
+            }
+        });
+
+        // Handle file input change for second tab
+        document.getElementById('fileInput2').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const statusEl = document.getElementById('importStatus2');
+            statusEl.style.display = 'block';
+            statusEl.textContent = 'Importing file...';
+            statusEl.className = 'import-status';
+            
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            
+            // Check if file type matches selected import mode
+            if ((fileExt === 'xlsx' || fileExt === 'xls') && importMode.startsWith('excel')) {
+                processExcelFile2(file);
+            } else if ((fileExt === 'doc' || fileExt === 'docx') && importMode === 'word') {
+                processWordFile2(file);
+            } else {
+                statusEl.textContent = 'Error: File type does not match selected import mode';
+                statusEl.className = 'import-status import-error';
+            }
+        });
 
     </script>
 </body>
