@@ -1304,7 +1304,25 @@
             align-items: center;
             gap: 10px;
         }
+
+        /* Responsive Stacking controlled by JS */
+        .layout-stacked .view-container .container {
+            flex-direction: column;
+            height: auto; /* Allow height to adjust to content */
+        }
+
+        @media (max-width: 1000px) { /* Updated breakpoint for heading wrap */
+            .text-box h2 {
+                flex-wrap: wrap; /* Allow title and actions to wrap */
+                gap: 5px;        /* Add a small gap when wrapped */
+            }
+            /* Optional: Add margin below title when wrapped, if needed */
+            /* .text-box h2 span { margin-bottom: 5px; } */
+        }
     </style>
+
+    <!-- Media Query for Responsive Layout REMOVED -->
+
 </head>
 <body>
     <div class="header">
@@ -3612,6 +3630,43 @@
                 </svg> Process with AI`;
             }
         }
+
+        // === Dynamic Layout Stacking Logic ===
+        const bodyElement = document.body;
+        const sidebarElement = document.querySelector('.nav-sidebar');
+        const expandedBreakpoint = 1150; // Updated Breakpoint when sidebar is open
+        const collapsedBreakpoint = 980; // Recalculated breakpoint when sidebar is closed (1150 - 170)
+
+        function updateLayoutBasedOnWidth() {
+            if (!sidebarElement) return; // Safety check
+
+            const isSidebarCollapsed = sidebarElement.classList.contains('collapsed');
+            const currentBreakpoint = isSidebarCollapsed ? collapsedBreakpoint : expandedBreakpoint;
+            const currentWindowWidth = window.innerWidth;
+
+            if (currentWindowWidth <= currentBreakpoint) {
+                bodyElement.classList.add('layout-stacked');
+            } else {
+                bodyElement.classList.remove('layout-stacked');
+            }
+        }
+
+        // Initial check on load
+        window.addEventListener('load', updateLayoutBasedOnWidth);
+
+        // Update on window resize
+        window.addEventListener('resize', updateLayoutBasedOnWidth);
+
+        // Update when sidebar is toggled (after the existing toggle logic)
+        const sidebarToggleBtn = document.getElementById('sidebarToggle');
+        if (sidebarToggleBtn) {
+            sidebarToggleBtn.addEventListener('click', () => {
+                // Delay slightly to ensure classList update has happened
+                setTimeout(updateLayoutBasedOnWidth, 50); 
+            });
+        }
+        // === End Dynamic Layout Stacking Logic ===
+
     </script>
 </body>
 </html>
