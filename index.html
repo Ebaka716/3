@@ -2223,28 +2223,43 @@
             updateCopyButtonText2();
         }
         
+        /**
+         * Shared function to update format display with configuration options
+         * @param {Object} config - Configuration object
+         * @param {Object} config.source - Source Quill editor
+         * @param {string} config.inputTextId - ID of the input text element
+         * @param {string|boolean} config.currentFormat - Current format (html or markdown)
+         */
+        function updateFormatDisplayWithConfig(config) {
+            const html = config.source.root.innerHTML;
+            const inputText = document.getElementById(config.inputTextId);
+            
+            if (!inputText) return;
+            
+            if (config.currentFormat === 'html') {
+                inputText.value = html;
+            } else {
+                const markdown = new showdown.Converter().makeMarkdown(html);
+                inputText.value = markdown;
+            }
+        }
+
         function updateFormatDisplay() {
-            var html = quill.root.innerHTML;
-            
-            if (currentFormat === 'html') {
-                document.getElementById('inputText').value = html;
-            } else {
-                var markdown = new showdown.Converter().makeMarkdown(html);
-                document.getElementById('inputText').value = markdown;
-            }
+            updateFormatDisplayWithConfig({
+                source: quill,
+                inputTextId: 'inputText',
+                currentFormat: currentFormat
+            });
         }
-        
+
         function updateFormatDisplay2() {
-            var html = quill2.root.innerHTML;
-            
-            if (currentFormat2 === 'html') {
-                document.getElementById('inputText2').value = html;
-            } else {
-                var markdown = new showdown.Converter().makeMarkdown(html);
-                document.getElementById('inputText2').value = markdown;
-            }
+            updateFormatDisplayWithConfig({
+                source: quill2,
+                inputTextId: 'inputText2',
+                currentFormat: currentFormat2
+            });
         }
-        
+
         function updateCopyButtonText() {
             var copyButton = document.getElementById('copyButton');
             if (currentFormat === 'html') {
@@ -2263,25 +2278,35 @@
             }
         }
         
+        /**
+         * Shared function to copy content to clipboard
+         * @param {Object} config - Configuration object 
+         * @param {string} config.inputTextId - ID of the input text element to copy from
+         * @param {number} config.tabNumber - Tab number for logging
+         */
+        function copyToClipboardWithConfig(config) {
+            const textToCopy = document.getElementById(config.inputTextId).value;
+            
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    showSuccessToast("Copied to clipboard!");
+                })
+                .catch(err => {
+                    console.error(`Failed to copy for Tab ${config.tabNumber}: `, err);
+                });
+        }
+
         function copyCurrentFormat() {
-            var textToCopy = document.getElementById('inputText').value;
-            // console.log("Attempting to copy for Tab 1..."); // DEBUG Removed
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                // console.log("Clipboard write successful for Tab 1."); // DEBUG Removed
-                showSuccessToast("Copied to clipboard!");
-            }).catch(err => {
-                console.error("Failed to copy for Tab 1: ", err); // Keep error logging
+            copyToClipboardWithConfig({
+                inputTextId: 'inputText',
+                tabNumber: 1
             });
         }
-        
+
         function copyCurrentFormat2() {
-            var textToCopy = document.getElementById('inputText2').value;
-            // console.log("Attempting to copy for Tab 2..."); // DEBUG Removed
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                // console.log("Clipboard write successful for Tab 2."); // DEBUG Removed
-                showSuccessToast("Copied to clipboard!");
-            }).catch(err => {
-                console.error("Failed to copy for Tab 2: ", err); // Keep error logging
+            copyToClipboardWithConfig({
+                inputTextId: 'inputText2',
+                tabNumber: 2
             });
         }
         
