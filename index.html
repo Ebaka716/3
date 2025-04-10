@@ -1380,7 +1380,7 @@
                                             <span class="return-icon">↩</span>
                                             <span class="intent-label">User Intent</span>
                                         </div>
-                                        <div class="card-content" id="cardContentArea"></div>
+                                        <div class="card-content" id="cardContentArea1"></div>
                                         <div class="card-pill-container">
                                             <span class="card-pill">Option 1</span>
                                             <span class="card-pill">Option 2</span>
@@ -2150,7 +2150,7 @@
             var html = quill.root.innerHTML;
             
             // Update Card Preview
-            const cardContentArea = document.getElementById('cardContentArea');
+            const cardContentArea = document.getElementById('cardContentArea1');
             cardContentArea.innerHTML = html;
             
             // Update format display based on current selection
@@ -2769,12 +2769,32 @@
             // Get HTML from the editor
             var html = quill2.root.innerHTML;
             
-            // Update Card Preview
-            const cardContentArea = document.getElementById('cardContentArea');
-            cardContentArea.innerHTML = html;
+            // Create a second card content area if it doesn't exist yet
+            let cardContentArea2 = document.getElementById('cardContentArea2');
+            if (!cardContentArea2) {
+                // Create it if it doesn't exist in the DOM yet
+                cardContentArea2 = document.createElement('div');
+                cardContentArea2.id = 'cardContentArea2';
+                
+                // Find the modal preview area and set it up
+                const modalCardContentArea = document.getElementById('modalCardContentArea');
+                if (modalCardContentArea) {
+                    modalCardContentArea.parentElement.classList.add('with-intent');
+                    modalCardContentArea.innerHTML = html;
+                }
+            } else {
+                // Update the AI preview area
+                cardContentArea2.innerHTML = html;
+                
+                // Also update the modal preview if visible
+                const modalCardContentArea = document.getElementById('modalCardContentArea');
+                if (modalCardContentArea) {
+                    modalCardContentArea.innerHTML = html;
+                }
+            }
             
             // Update format display based on current selection
-            updateFormatDisplay();
+            updateFormatDisplay2();
         }
         
         // Show global error
@@ -2909,7 +2929,7 @@
             
             // Show Modal
             showPreviewButton.addEventListener('click', () => {
-                const content = quill2.root.innerHTML; // Get content from AI editor
+                const content = quill2.root.innerHTML; // Get content directly from AI editor
                 modalCardContentArea.innerHTML = content; // Set modal preview content
                 previewModal.style.display = 'flex'; // Show modal
                 document.body.classList.add('modal-open'); // Add class to body
