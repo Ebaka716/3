@@ -1323,13 +1323,7 @@
                                 <div id="editor-container"></div>
                                 
                                 <!-- Clear button positioned within editor area -->
-                                <button id="clearButton" class="clear-button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                    </svg>
-                                    Clear Content
-                                </button>
+                                <!-- Button removed as requested -->
                             </div>
                             <!-- Hidden textarea to store raw content -->
                             <textarea id="rawContent" class="raw-text"></textarea>
@@ -1465,6 +1459,7 @@
                         <!-- Quill editor container with relative positioning -->
                         <div style="position: relative; flex-grow: 1; display: flex; flex-direction: column;">
                             <div id="editor-container2"></div>
+                            <!-- Clear button for editor 2 never existed here -->
                         </div>
                         
                         <!-- Hidden textarea to store raw content -->
@@ -1544,14 +1539,7 @@
                         <!-- Quill editor container -->
                         <div style="position: relative; flex-grow: 1; display: flex; flex-direction: column;">
                             <div id="editor-container3"></div> <!-- ID changed -->
-                            <!-- Clear button positioned within editor area (added) -->
-                            <button id="clearButton3" class="clear-button"> 
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                                Clear Content
-                            </button>
+                            <!-- Clear button positioned within editor area (removed) -->
                         </div>
                         
                         <!-- Hidden textarea to store raw content -->
@@ -2524,82 +2512,14 @@
             // Connect AI config button for tab 3 ( reusing same modal for now)
             document.getElementById('aiConfigButton3').addEventListener('click', showAIConfig);
             
-            // Connect clear buttons
-            document.getElementById('clearButton').addEventListener('click', clearEditor);
-            document.getElementById('clearButton2').addEventListener('click', clearEditor2);
-            document.getElementById('clearButton3').addEventListener('click', clearEditor3); // Added for tab 3
+            // Connect clear buttons - removed as requested
         };
         
         // Clear first editor (Content Editor tab)
-        function clearEditor() {
-            // Ask for confirmation before clearing
-            if (confirm('Are you sure you want to clear all content?')) {
-                // Clear Quill editor
-                quill.setText('');
-                
-                // Update previews
-                updatePreviews();
-                
-                // Show status message
-                const statusEl = document.getElementById('importStatus');
-                statusEl.style.display = 'block';
-                statusEl.textContent = 'Content cleared';
-                statusEl.className = 'import-status import-success';
-                
-                // Hide the message after 2 seconds
-                setTimeout(() => {
-                    statusEl.style.display = 'none';
-                }, 2000);
-            }
-        }
         
         // Clear second editor (AI Format tab)
-        function clearEditor2() {
-            // Ask for confirmation before clearing
-            if (confirm('Are you sure you want to clear all content?')) {
-                // Clear Quill editor
-                quill2.setText('');
-                
-                // Update previews
-                updatePreviews2();
-                
-                // Show status message
-                const statusEl = document.getElementById('importStatus2');
-                statusEl.style.display = 'block';
-                statusEl.textContent = 'Content cleared';
-                statusEl.className = 'import-status import-success';
-                
-                // Hide the message after 2 seconds
-                setTimeout(() => {
-                    statusEl.style.display = 'none';
-                }, 2000);
-            }
-        }
         
         // --- Clear third editor (AI Process tab) ---
-        function clearEditor3() {
-            // Ask for confirmation before clearing
-            if (confirm('Are you sure you want to clear all content in this processing step?')) {
-                // Clear Quill editor
-                quill3.setText('');
-                
-                // Update previews
-                updatePreviews3();
-                
-                // Show status message
-                const statusEl = document.getElementById('importStatus3');
-                if (statusEl) { // Check if element exists
-                    statusEl.style.display = 'block';
-                    statusEl.textContent = 'Content cleared';
-                    statusEl.className = 'import-status import-success';
-                    
-                    // Hide the message after 2 seconds
-                    setTimeout(() => {
-                        if (statusEl) statusEl.style.display = 'none';
-                    }, 2000);
-                }
-            }
-        }
         
         // AI formatting function that uses OpenAI API
         async function formatWithAI() {
