@@ -3081,7 +3081,7 @@
             });
 
             // View switching for AI Config modal (System vs Model Settings)
-            document.querySelectorAll('.modal-view-tab').forEach(tab => {
+            document.querySelectorAll('#aiConfigModal > .modal-tabs > .modal-tab').forEach(tab => { 
                 tab.addEventListener('click', function() {
                     const viewId = this.getAttribute('data-view');
                     switchView(viewId);
