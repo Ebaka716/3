@@ -3081,11 +3081,15 @@
             });
 
             // View switching for AI Config modal (System vs Model Settings)
-            document.querySelectorAll('#aiConfigModal > .modal-tabs > .modal-tab').forEach(tab => { 
-                tab.addEventListener('click', function() {
-                    const viewId = this.getAttribute('data-view');
-                    switchView(viewId);
-                });
+            // Ensure this targets ONLY the top-level System/Model tabs
+            document.querySelectorAll('#aiConfigModal > div.modal-tabs > button.modal-tab').forEach(tab => { 
+                // Check if the button has a data-view attribute (to exclude provider tabs)
+                if (tab.hasAttribute('data-view')) { 
+                    tab.addEventListener('click', function() {
+                        const viewId = this.getAttribute('data-view');
+                        switchView(viewId);
+                    });
+                } 
             });
 
             // Temperature sliders
