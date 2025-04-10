@@ -5002,6 +5002,18 @@
             claudeTempSlider.addEventListener('input', function() {
                 claudeTempValue.textContent = this.value;
             });
+            
+            // Add event listeners for close and cancel buttons
+            const aiModalClose = document.getElementById('aiModalClose');
+            const aiModalCancel = document.getElementById('aiModalCancel');
+            
+            if (aiModalClose) {
+                aiModalClose.addEventListener('click', closeAIConfigModal);
+            }
+            
+            if (aiModalCancel) {
+                aiModalCancel.addEventListener('click', closeAIConfigModal);
+            }
         });
         
         // Update previews specifically after AI formatting
