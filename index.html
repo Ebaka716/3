@@ -871,8 +871,10 @@
         #showPreviewButton:hover {
             background-color: #3700b3;
         }
-        body.tab-two-active #showPreviewButton {
-            display: flex; /* Show when tab 2 is active */
+        /* Modified to show for tab-two OR tab-three */
+        body.tab-two-active #showPreviewButton,
+        body.tab-three-active #showPreviewButton {
+            display: flex; /* Show when tab 2 or 3 is active */
         }
         /* === End Floating Preview Button === */
 
@@ -1895,8 +1897,13 @@
                 // Toggle body class for floating button
                 if (viewToShow === 'tab-two') {
                     document.body.classList.add('tab-two-active');
+                    document.body.classList.remove('tab-three-active');
+                } else if (viewToShow === 'tab-three') {
+                    document.body.classList.add('tab-three-active');
+                    document.body.classList.remove('tab-two-active');
                 } else {
                     document.body.classList.remove('tab-two-active');
+                    document.body.classList.remove('tab-three-active');
                 }
             });
         });
@@ -3253,13 +3260,23 @@
         const modalCardContentArea = document.getElementById('modalCardContentArea');
         const modalCardStyleSelector = document.getElementById('modalCardStyleSelector');
         const modalCardPreviewContent = document.getElementById('modalCardPreviewContent');
+        const modalTitle = previewModal.querySelector('.modal-title'); // Get modal title element
 
-        if (showPreviewButton && previewModal && previewModalClose && modalCardContentArea && modalCardStyleSelector && modalCardPreviewContent) {
+        if (showPreviewButton && previewModal && previewModalClose && modalCardContentArea && modalCardStyleSelector && modalCardPreviewContent && modalTitle) {
             
             // Show Modal
             showPreviewButton.addEventListener('click', () => {
-                const content = quill2.root.innerHTML; // Get content directly from AI editor
+                let content;
+                let titleText;
+                if (document.body.classList.contains('tab-three-active')) {
+                    content = quill3.root.innerHTML; // Get content from Tab 3 editor
+                    titleText = "AI Process Card Preview";
+                } else { // Assumes tab-two-active if not tab-three-active
+                    content = quill2.root.innerHTML; // Get content from Tab 2 editor
+                    titleText = "AI Format Card Preview";
+                }
                 modalCardContentArea.innerHTML = content; // Set modal preview content
+                modalTitle.textContent = titleText; // Set modal title
                 previewModal.style.display = 'flex'; // Show modal
                 document.body.classList.add('modal-open'); // Add class to body
                 // Ensure initial style matches dropdown
