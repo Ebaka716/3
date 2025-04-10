@@ -627,6 +627,19 @@
             margin: 0;
         }
         
+        #inputText3 {
+            flex-grow: 1;        /* Expand vertically */
+            width: 100%;         /* Fill width */
+            height: 100%;        /* Attempt to fill height (might need adjustment) */
+            box-sizing: border-box; /* Include padding/border in size */
+            padding: 8px;        /* Consistent padding */
+            margin: 0;           /* Remove default margin */
+            border: 1px solid #ccc; /* Consistent border */
+            border-radius: 4px;  /* Consistent border radius */
+            resize: vertical;    /* Allow user to resize vertically */
+            min-height: 150px;   /* Ensure a minimum usable height */
+        }
+        
         .import-button {
             background-color: #28a745;
             display: flex;
@@ -2344,43 +2357,49 @@
         }
 
         function toggleFormat(format) {
+            // Update the global variable BEFORE calling the config function
+            currentFormat = format;
+            
             toggleFormatWithConfig({
                 format: format,
                 htmlToggleId: 'htmlToggle',
                 markdownToggleId: 'markdownToggle',
                 formatDisplayFn: updateFormatDisplay,
                 copyButtonTextFn: updateCopyButtonText,
-                formatRef: { current: currentFormat }
+                formatRef: { current: currentFormat } // Pass the updated value
             });
-            // Update the global variable
-            currentFormat = format;
+            // Global variable update removed from here
         }
 
         function toggleFormat2(format) {
+            // Update the global variable BEFORE calling the config function
+            currentFormat2 = format;
+
             toggleFormatWithConfig({
                 format: format,
                 htmlToggleId: 'htmlToggle2',
                 markdownToggleId: 'markdownToggle2',
                 formatDisplayFn: updateFormatDisplay2,
                 copyButtonTextFn: updateCopyButtonText2,
-                formatRef: { current: currentFormat2 }
+                formatRef: { current: currentFormat2 } // Pass the updated value
             });
-            // Update the global variable
-            currentFormat2 = format;
+            // Global variable update removed from here
         }
         
         // --- Toggle Format for Tab 3 ---
         function toggleFormat3(format) {
+            // Update the global variable BEFORE calling the config function
+            currentFormat3 = format;
+
             toggleFormatWithConfig({
                 format: format,
                 htmlToggleId: 'htmlToggle3',
                 markdownToggleId: 'markdownToggle3',
                 formatDisplayFn: updateFormatDisplay3,
                 copyButtonTextFn: updateCopyButtonText3,
-                formatRef: { current: currentFormat3 }
+                formatRef: { current: currentFormat3 } // Pass the updated value
             });
-            // Update the global variable
-            currentFormat3 = format;
+            // Global variable update removed from here
         }
         
         /**
