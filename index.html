@@ -1002,6 +1002,9 @@
             overflow: hidden;
             flex-grow: 1; /* Make it fill available space */
             min-height: 0; /* Prevent flexbox issues */
+            flex: 1; /* Equal width boxes */
+            max-width: calc(50% - 10px); /* Account for gap */
+            height: 100%; /* Ensure full height */
         }
         
         #tab-one .container {
@@ -1016,50 +1019,58 @@
             justify-content: space-between;
         }
         
-        /* Update grid layout to flex for better height handling */
-        #tab-one .container {
-            display: flex; /* Change from grid to flex */
-            flex-direction: row; /* Side by side boxes */
-            justify-content: space-between;
+        #tab-one #editor-pane {
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for nested flex items */
+            overflow: hidden;
         }
         
-        #tab-one .text-box {
-            flex: 1; /* Equal width boxes */
-            max-width: calc(50% - 10px); /* Account for gap */
+        #tab-one #output-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for nested flex items */
+            overflow: hidden;
         }
         
         #tab-one #editor-container {
-            /* height: 250px; */ /* REMOVED */
-            flex-grow: 1; /* Make Quill container fill pane */
-            display: flex; /* Ensure inner Quill structure works */
+            flex: 1; /* Take all available space */
+            display: flex;
             flex-direction: column;
-            min-height: 0; /* Prevent flexbox issues with min-height */
+            min-height: 0; /* Important for nested flex containers */
+            overflow: hidden; /* Prevent overflow */
+            height: auto !important; /* Override any inline height */
         }
-         /* Ensure Quill editor area grows */
-        #tab-one #editor-container .ql-editor {
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
+        
         #tab-one .output-container {
-            /* height: 280px; */ /* REMOVED */
-            /* max-height: 280px; */ /* REMOVED */
-            flex-grow: 1; /* Make output container fill pane */
-            display: flex; /* To make textarea grow */
-            flex-direction: column; /* Ensure textarea can grow */
-            min-height: 0; /* Prevent flexbox issues */
+            flex: 1; /* Fill available space */
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for nested flex items */
         }
-
+        
         #tab-one #inputText {
-            /* height: 100%; */ /* Let flexbox handle */
-            /* max-height: 280px; */ /* REMOVED */
-            flex-grow: 1; /* Make textarea fill container */
-            resize: none; /* Disable textarea's own resize */
-            border: none; /* Optional: remove border if container handles it */
-            padding: 5px; /* Add some internal padding */
-            overflow-y: auto; /* Allow scrolling within textarea */
+            flex: 1; /* Fill the container */
+            min-height: 0; /* Important for flex child */
+            resize: none; /* Disable resize */
         }
-
+        
+        /* Fix for Quill editor internals */
+        #tab-one .ql-container {
+            flex: 1 !important;
+            min-height: 0 !important;
+            height: auto !important;
+        }
+        
+        #tab-one .ql-editor {
+            flex: 1 !important;
+            min-height: 0 !important;
+            height: auto !important;
+            overflow-y: auto !important;
+        }
+        
         #tab-one .import-status {
             margin-top: 10px;
             position: absolute;
