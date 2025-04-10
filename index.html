@@ -2910,38 +2910,46 @@
 
         // Function to switch tabs in the modal
         function switchTab(tabId) {
-            // Update tab buttons
-            document.querySelectorAll('.modal-tab').forEach(tab => {
+            // Update tab buttons - Scope the selector to only affect provider tabs within the model settings view
+            document.querySelectorAll('#model-settings-view .modal-tab').forEach(tab => {
                 tab.classList.remove('active');
                 if (tab.getAttribute('data-tab') === tabId) {
                     tab.classList.add('active');
                 }
             });
-            
+
             // Update content panels
             document.querySelectorAll('.tab-panel').forEach(panel => {
                 panel.classList.remove('active');
                 panel.style.display = 'none';
             });
-            
+
             const activePanel = document.getElementById(tabId);
             if (activePanel) {
                 activePanel.classList.add('active');
                 activePanel.style.display = 'block';
+            } else {
+                 console.error(`Could not find tab panel element with ID: ${tabId}`); // Keep this error log
             }
         }
         
         // Replace placeholder with actual AI config function
         function showAIConfig() {
             const aiConfigModal = document.getElementById('aiConfigModal');
-            
+
             // Load saved settings
             loadSavedAISettings();
-            
+
             // Show the modal
-            aiConfigModal.style.display = 'flex';
+            if (aiConfigModal) {
+                aiConfigModal.style.display = 'flex';
+            } else {
+                console.error("Could not find #aiConfigModal element!"); // Keep this error log
+            }
+
             // Default to system settings view
             switchView('system-settings-view');
+            document.body.classList.add('modal-open'); // Add class to body
         }
         
         // Load saved AI settings from localStorage
@@ -3019,7 +3027,10 @@
         
         function closeAIConfigModal() {
             const aiConfigModal = document.getElementById('aiConfigModal');
-            aiConfigModal.style.display = 'none';
+            if (aiConfigModal) {
+                aiConfigModal.style.display = 'none';
+            }
+            document.body.classList.remove('modal-open'); // Remove class from body
         }
         
         // Save AI configuration settings
@@ -3072,7 +3083,7 @@
         
         // Initialize tab functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Tab switching for AI Config modal (Provider Tabs)
+            // Tab switching for AI Config modal (Provider Tabs within Model Settings view)
             document.querySelectorAll('#model-settings-view .modal-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     const tabId = this.getAttribute('data-tab');
@@ -3081,15 +3092,12 @@
             });
 
             // View switching for AI Config modal (System vs Model Settings)
-            // Ensure this targets ONLY the top-level System/Model tabs
-            document.querySelectorAll('#aiConfigModal > div.modal-tabs > button.modal-tab').forEach(tab => { 
-                // Check if the button has a data-view attribute (to exclude provider tabs)
-                if (tab.hasAttribute('data-view')) { 
-                    tab.addEventListener('click', function() {
-                        const viewId = this.getAttribute('data-view');
-                        switchView(viewId);
-                    });
-                } 
+            // Corrected selector to target only the top-level view tabs
+            document.querySelectorAll('#aiConfigModal .modal-content > div.modal-tabs > button.modal-tab[data-view]').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const viewId = this.getAttribute('data-view');
+                    switchView(viewId);
+                });
             });
 
             // Temperature sliders
@@ -3380,7 +3388,8 @@
         // Function to switch main views in the modal (System vs Model Settings)
         function switchView(viewId) {
             // Update view selector buttons - Target top-level tabs now
-            document.querySelectorAll('#aiConfigModal > .modal-tabs > .modal-tab').forEach(tab => {
+            // Corrected selector and added logic to manage .active class on buttons
+            document.querySelectorAll('#aiConfigModal .modal-content > div.modal-tabs > button.modal-tab[data-view]').forEach(tab => {
                 tab.classList.remove('active');
                 if (tab.getAttribute('data-view') === viewId) {
                     tab.classList.add('active');
@@ -3390,18 +3399,20 @@
             // Update view content panels
             document.querySelectorAll('.modal-view').forEach(view => {
                 view.classList.remove('active');
-                view.style.display = 'none';
+                view.style.display = 'none'; // Hides all views
             });
 
-            const activeView = document.getElementById(viewId);
+            const activeView = document.getElementById(viewId); // Get the specific view element
             if (activeView) {
                 activeView.classList.add('active');
-                activeView.style.display = 'block';
+                activeView.style.display = 'block'; // Shows the target view
                 // If switching to model settings, ensure the correct provider tab is shown based on default provider
                 if (viewId === 'model-settings-view') {
                      const defaultProvider = document.getElementById('aiProvider').value || 'openai';
-                     switchTab(defaultProvider === 'claude' ? 'claude-panel' : 'openai-panel');
+                     switchTab(defaultProvider === 'claude' ? 'claude-panel' : 'openai-panel'); // Calls switchTab
                 }
+            } else {
+                console.error(`Could not find view element with ID: ${viewId}`); // Keep this error log
             }
         }
 
