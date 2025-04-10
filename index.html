@@ -153,18 +153,31 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            /* Changed from grid to flex for standardization */
+            display: flex; 
+            /* grid-template-columns: 1fr 1fr; Removed */ 
             gap: 20px;
         }
-        .container.ai-view {
-            grid-template-columns: 1fr;
-        }
+        /* Removed container.ai-view rule as flex handles single column when needed */
+
         .view-container {
             display: none;
             flex-grow: 1;
             flex-direction: column;
         }
+
+        /* NEW: Standardized container styles for all tabs */
+        .view-container .container {
+            display: flex; 
+            flex-direction: row; 
+            gap: 20px; 
+            padding: 0; /* Standardized to 0 */
+            max-width: 100%; 
+            flex-grow: 1; 
+            min-height: 0; 
+            height: calc(100vh - 120px); /* Standardized height */
+        }
+
         .view-container.active {
             display: flex;
         }
@@ -202,13 +215,19 @@
         }
         
         .text-box {
+            /* Moved common styles here */
             background: white;
             border-radius: 8px;
-            padding: 15px;
+            padding: 15px; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            height: 620px;
+            /* height: 620px; Removed fixed height */
             display: flex;
             flex-direction: column;
+            /* Added standard flex/sizing/height */
+            flex: 1; 
+            overflow: hidden; 
+            min-height: 0; 
+            height: 100%; /* Ensure full height within container */
         }
         .text-box h2 {
             margin-top: 0;
@@ -994,31 +1013,9 @@
         }
         
         /* Tab One specific styles to maximize space */
-        #tab-one .text-box {
-            /* height: 620px; */ /* Removed fixed height */
-            /* max-height: 620px; */ /* Removed max-height */
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            flex-grow: 1; /* Make it fill available space */
-            min-height: 0; /* Prevent flexbox issues */
-            flex: 1; /* Equal width boxes */
-            max-width: calc(50% - 10px); /* Account for gap */
-            height: 100%; /* Ensure full height */
-        }
+        /* REMOVED #tab-one .text-box block as styles are now general */
         
-        #tab-one .container {
-            gap: 20px;
-            padding: 0 32px;
-            max-width: 100%;
-            flex-grow: 1; /* Added */
-            min-height: 0; /* Added */
-            height: calc(100vh - 120px); /* Take full viewport height minus header */
-            display: flex; /* Changed from grid to flex */
-            flex-direction: row; /* Side by side boxes */
-            justify-content: space-between;
-        }
+        /* REMOVED #tab-one .container block as styles are now general */
         
         #tab-one #editor-pane {
             flex: 1; 
@@ -1079,21 +1076,12 @@
         }
         
         /* Tab Two specific styles to maximize space */
-        #tab-two .text-box {
-            height: calc(100vh - 120px);
-            max-height: 850px;
-            width: 100%;
-        }
+        /* REMOVED #tab-two .text-box block as styles are now general */
         
-        #tab-two .container {
-            gap: 20px;
-            padding: 0; /* Changed from 0 32px */
-            max-width: 100%;
-        }
-        
+        /* REMOVED #tab-two .container block as styles are now general */
+
         #tab-two #editor-container2 {
             /* height: 350px; */ /* Removed fixed height */
-            /* margin-bottom: 20px; */ /* Removed margin */
             flex-grow: 1; /* Added to fill space */
             display: flex; /* Added for inner Quill elements */
             flex-direction: column; /* Added for inner Quill elements */
