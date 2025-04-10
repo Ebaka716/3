@@ -1272,14 +1272,14 @@
     </div>
     
     <!-- Global error notification container -->
-    <div id="globalErrorContainer" class="error-container">
+    <div id="globalErrorContainer" class="error-container" role="alert">
         <div class="error-title">Error</div>
         <p class="error-message" id="globalErrorMessage"></p>
     </div>
     
     <div class="app-container">
         <div class="nav-sidebar">
-            <button class="sidebar-toggle" id="sidebarToggle">
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar menu">
                 <svg class="sidebar-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
@@ -1441,7 +1441,7 @@
                                     </svg>
                                     Format with AI
                                 </button>
-                                <button id="aiConfigButton" style="background: none; border: none; padding: 8px 5px; cursor: pointer; margin-left: 0;">
+                                <button id="aiConfigButton" aria-label="AI Configuration" style="background: none; border: none; padding: 8px 5px; cursor: pointer; margin-left: 0;">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#6200ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
                                         <circle cx="12" cy="12" r="2"></circle>
                                         <path d="M12 6V4"></path>
@@ -1521,7 +1521,7 @@
                                     Process with AI <!-- Changed Button Text -->
                                 </button>
                                 <!-- Config button can potentially be shared or specific -->
-                                <button id="aiConfigButton3" style="background: none; border: none; padding: 8px 5px; cursor: pointer; margin-left: 0;"> <!-- ID changed (for now, maybe consolidate later) -->
+                                <button id="aiConfigButton3" aria-label="AI Configuration" style="background: none; border: none; padding: 8px 5px; cursor: pointer; margin-left: 0;"> <!-- ID changed (for now, maybe consolidate later) -->
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#6200ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
                                         <circle cx="12" cy="12" r="2"></circle>
                                         <path d="M12 6V4"></path>
@@ -1574,7 +1574,7 @@
         </div>
     </div>
 
-    <div id="copySuccess" class="copy-success"></div> <!-- Message set by JS -->
+    <div id="copySuccess" class="copy-success" aria-live="polite"></div> <!-- Message set by JS -->
 
     <!-- Floating Preview Button (Initially Hidden) -->
     <button id="showPreviewButton" title="Show Card Preview">
@@ -1582,11 +1582,11 @@
     </button>
     
     <!-- Import Modal -->
-    <div id="importModal" class="modal">
+    <div id="importModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Select Import Format</h3>
-                <button class="modal-close" id="modalClose">&times;</button>
+                <h3 class="modal-title" id="importModalTitle">Select Import Format</h3>
+                <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
             </div>
             <div class="modal-options">
                 <div class="modal-option" data-import-mode="word">
@@ -1640,12 +1640,12 @@
     </div>
 
     <!-- AI Config Modal -->
-    <div id="aiConfigModal" class="modal">
+    <div id="aiConfigModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="aiConfigModalTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">AI Configuration</h3>
+                <h3 class="modal-title" id="aiConfigModalTitle">AI Configuration</h3>
                 <!-- View Selector Buttons MOVED below -->
-                <button class="modal-close" id="aiModalClose" style="margin-left: auto;">&times;</button>
+                <button class="modal-close" id="aiModalClose" aria-label="Close AI Configuration modal" style="margin-left: auto;">&times;</button>
             </div>
 
             <!-- NEW: Top-level Tabs for View Switching -->
@@ -1693,7 +1693,7 @@
                     </div>
                     <div style="margin-bottom: 16px;">
                         <label for="temperature" style="display: block; margin-bottom: 6px; font-weight: 500;">Temperature: <span id="tempValue">0.7</span></label>
-                        <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7" style="width: 100%;">
+                        <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7" style="width: 100%;" aria-labelledby="temperatureLabel">
                         <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
                             <span>More focused</span>
                             <span>More creative</span>
@@ -1720,7 +1720,7 @@
                     </div>
                     <div style="margin-bottom: 16px;">
                         <label for="claudeTemperature" style="display: block; margin-bottom: 6px; font-weight: 500;">Temperature: <span id="claudeTempValue">0.7</span></label>
-                        <input type="range" id="claudeTemperature" min="0" max="1" step="0.1" value="0.7" style="width: 100%;">
+                        <input type="range" id="claudeTemperature" min="0" max="1" step="0.1" value="0.7" style="width: 100%;" aria-labelledby="claudeTemperatureLabel">
                         <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
                             <span>More focused</span>
                             <span>More creative</span>
@@ -1744,11 +1744,11 @@
     </div>
 
     <!-- Preview Modal -->
-    <div id="previewModal" class="modal"> <!-- Reusing .modal styles -->
+    <div id="previewModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle"> <!-- Reusing .modal styles -->
         <div class="modal-content" style="width: 600px; max-width: 90%;"> <!-- Wider content area -->
             <div class="modal-header">
-                <h3 class="modal-title">AI Format Card Preview</h3>
-                <button class="modal-close" id="previewModalClose">&times;</button>
+                <h3 class="modal-title" id="previewModalTitle">AI Format Card Preview</h3>
+                <button class="modal-close" id="previewModalClose" aria-label="Close preview modal">&times;</button>
             </div>
             <!-- Controls Bar Below Header -->
             <div class="modal-controls-bar">
