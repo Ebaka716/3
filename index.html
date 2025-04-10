@@ -371,6 +371,12 @@
             color: white;
             border-color: #007bff;
         }
+        /* Added hover style for toggle buttons */
+        .toggle-button:hover {
+            color: white;           /* Set text color to white on hover */
+            background-color: #0056b3; /* Darker blue background on hover */
+            border-color: #0056b3;     /* Match border color */
+        }
         .toggle-button:first-child {
             border-radius: 4px 0 0 4px;
         }
@@ -1632,12 +1638,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">AI Configuration</h3>
-                <!-- New View Selector Buttons -->
-                <div class="modal-view-selector" style="margin-left: 20px;">
-                    <button class="modal-view-tab active" data-view="system-settings-view">System Settings</button>
-                    <button class="modal-view-tab" data-view="model-settings-view">Model Settings</button>
-                </div>
+                <!-- View Selector Buttons MOVED below -->
                 <button class="modal-close" id="aiModalClose" style="margin-left: auto;">&times;</button>
+            </div>
+
+            <!-- NEW: Top-level Tabs for View Switching -->
+            <div class="modal-tabs" style="margin-left: 0;"> <!-- Renamed class, removed inline style -->
+                 <button class="modal-tab active" data-view="system-settings-view">System Settings</button> <!-- Renamed class -->
+                 <button class="modal-tab" data-view="model-settings-view">Model Settings</button> <!-- Renamed class -->
             </div>
 
             <!-- System Settings View -->
@@ -3367,8 +3375,8 @@
 
         // Function to switch main views in the modal (System vs Model Settings)
         function switchView(viewId) {
-            // Update view selector buttons
-            document.querySelectorAll('.modal-view-tab').forEach(tab => {
+            // Update view selector buttons - Target top-level tabs now
+            document.querySelectorAll('#aiConfigModal > .modal-tabs > .modal-tab').forEach(tab => {
                 tab.classList.remove('active');
                 if (tab.getAttribute('data-view') === viewId) {
                     tab.classList.add('active');
